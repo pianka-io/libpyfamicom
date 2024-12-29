@@ -10,6 +10,5 @@ int main() {
     rom_destroy(rom);
     emu_destroy(emu);
 
-//    printf("emu at $%lx\n", (unsigned long)emu);
     return 0;
 }
