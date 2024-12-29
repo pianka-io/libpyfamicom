@@ -14,8 +14,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR})
 set(SOURCES
     ${SRC_DIR}/app/main.c
     ${SRC_DIR}/com/clock.c
+    ${SRC_DIR}/com/globals.c
     ${SRC_DIR}/cpu/cpu.c
     ${SRC_DIR}/cpu/memory.c
+    ${SRC_DIR}/cpu/opcodes.c
+    ${SRC_DIR}/cpu/stack.c
     ${SRC_DIR}/emu/emu.c
     ${SRC_DIR}/ines/rom.c
 )

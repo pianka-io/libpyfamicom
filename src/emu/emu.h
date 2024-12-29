@@ -12,6 +12,6 @@ typedef struct emu_t {
 struct emu_t* emu_create(struct rom_t* rom);
 void emu_destroy(struct emu_t*);
 
-//void emu_tick(struct emu_t*);
+void emu_tick(struct emu_t*);
 
 #endif

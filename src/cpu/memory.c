@@ -3,15 +3,15 @@
 #include <string.h>
 
 #include "memory.h"
-#include "com/constants.h"
+#include "com/globals.h"
 
-uint16_t translate_address(struct cpu_t*, uint16_t);
+word translate_address(struct cpu_t*, word);
 
 struct cpu_memory_t* cpu_memory_create(struct rom_t* rom) {
     struct cpu_memory_t* memory = (struct cpu_memory_t*)calloc(1, sizeof(struct cpu_memory_t));
 
-    uint8_t* data = (uint8_t*)calloc(1, CPU_MEMORY_SIZE);
-    uint16_t prg_rom_size = rom->header.prg_rom * PRG_RAM_BANK_SIZE;
+    byte* data = (byte*)calloc(1, CPU_MEMORY_SIZE);
+    word prg_rom_size = rom->header.prg_rom * PRG_RAM_BANK_SIZE;
     memcpy(data + PRG_ROM_OFFSET, rom->data + 0x10, prg_rom_size);
 
     memory->data = data;
@@ -25,23 +25,23 @@ void cpu_memory_destroy(struct cpu_memory_t* memory) {
     free(memory);
 }
 
-uint8_t cpu_memory_read_byte(struct cpu_t* cpu, uint16_t address) {
+byte cpu_memory_read_byte(struct cpu_t* cpu, word address) {
     address = translate_address(cpu, address);
     return cpu->memory->data[address];
 }
 
-uint16_t cpu_memory_read_word(struct cpu_t* cpu, uint16_t address) {
+word cpu_memory_read_word(struct cpu_t* cpu, word address) {
     address = translate_address(cpu, address);
-    uint8_t low_byte = cpu->memory->data[address];
-    uint8_t high_byte = cpu->memory->data[address + 1];
-    return (uint16_t)(high_byte << 8 | low_byte);
+    byte low_byte = cpu->memory->data[address];
+    byte high_byte = cpu->memory->data[address + 1];
+    return (word)(high_byte << 8 | low_byte);
 }
 
-void cpu_memory_write_byte(struct cpu_t* cpu, uint16_t address, uint8_t value) {
+void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
     cpu->memory->data[address] = value;
 }
 
-uint16_t translate_address(struct cpu_t* cpu, uint16_t address) {
+word translate_address(struct cpu_t* cpu, word address) {
     if (cpu->memory->mirrored && address >= PRG_ROM_OFFSET + PRG_RAM_BANK_SIZE) {
         return address - PRG_RAM_BANK_SIZE;
     }

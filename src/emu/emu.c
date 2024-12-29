@@ -17,6 +17,6 @@ void emu_destroy(struct emu_t* emu) {
     free(emu);
 }
 
-//void emu_tick(struct emu_t* emu) {
-//    cpu_tick(emu->cpu);
-//}
+void emu_tick(struct emu_t* emu) {
+    cpu_tick(emu->cpu);
+}

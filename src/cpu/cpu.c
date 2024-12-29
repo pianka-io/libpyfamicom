@@ -1,9 +1,9 @@
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "cpu/cpu.h"
 #include "cpu/memory.h"
-#include "com/constants.h"
+#include "com/globals.h"
+#include "opcodes.h"
 
 struct cpu_t* cpu_create(struct rom_t* rom) {
     struct cpu_t* cpu = (struct cpu_t*)calloc(1, sizeof(struct cpu_t));
@@ -24,6 +24,6 @@ void cpu_destroy(struct cpu_t* cpu) {
     free(cpu);
 }
 
-//void cpu_tick(struct cpu_t* cpu) {
-//
-//}
+void cpu_tick(struct cpu_t* cpu) {
+    cpu_handle_instruction(cpu);
+}
