@@ -15,9 +15,13 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0x10: bpl_10(cpu); break;
         case 0x20: jsr_20(cpu); break;
         case 0x2C: bit_2c(cpu); break;
+        case 0x60: rts_60(cpu); break;
         case 0x78: sei_78(cpu); break;
+        case 0x85: sta_85(cpu); break;
         case 0x8D: sta_8d(cpu); break;
         case 0xA9: lda_a9(cpu); break;
+        case 0xC5: cmp_c5(cpu); break;
+        case 0xF0: beq_f0(cpu); break;
         default:
             printf("[$%04x] unknown opcode $%02x\n", pc, opcode);
             exit(0);
@@ -37,12 +41,12 @@ static inline void set_z(struct cpu_t* cpu, byte value) {
     cpu->registers->p = p;
 }
 
-//static inline void set_c(struct cpu_t* cpu, byte value) {
-//    byte p = cpu->registers->p;
-//    p = (p & ~CPU_STATUS_CARRY) | (value ? CPU_STATUS_CARRY : 0);
-//    cpu->registers->p = p;
-//}
-//
+static inline void set_c(struct cpu_t* cpu, word value) {
+    byte p = cpu->registers->p;
+    p = (p & ~CPU_STATUS_CARRY) | ((value >> 8) & CPU_STATUS_CARRY);
+    cpu->registers->p = p;
+}
+
 //static inline void set_v(struct cpu_t* cpu, byte value) {
 //    byte p = cpu->registers->p;
 //    p = (p & ~CPU_STATUS_OVERFLOW) | (value ? CPU_STATUS_OVERFLOW : 0);
@@ -50,25 +54,47 @@ static inline void set_z(struct cpu_t* cpu, byte value) {
 //}
 
 /* opcodes */
+void beq_f0(struct cpu_t* cpu) {
+    sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers->pc);
+    printf("[$%04x] beq *%+d\n", cpu->registers->pc, arg);
+    cpu->registers->pc += 1;
+    bool equal = is_flag_set(cpu->registers->p, CPU_STATUS_ZERO);
+    cpu->registers->pc += arg * equal;
+    cpu->clock->cpu_cycles += 2;
+}
+
 void bit_2c(struct cpu_t* cpu) {
     word arg = cpu_memory_read_word(cpu, cpu->registers->pc);
     printf("[$%04x] bit $%04x\n", cpu->registers->pc, arg);
     cpu->registers->pc += 2;
     byte value = cpu_memory_read_byte(cpu, arg);
     byte nv = value & (CPU_STATUS_NEGATIVE | CPU_STATUS_OVERFLOW);
-    byte p = cpu->registers->p & ~ (CPU_STATUS_NEGATIVE | CPU_STATUS_OVERFLOW);
+    byte p = cpu->registers->p & ~(CPU_STATUS_NEGATIVE | CPU_STATUS_OVERFLOW);
     cpu->registers->p = p | nv;
     byte result = cpu->registers->a & value;
     set_z(cpu, result);
-    cpu->clock.cpu_cycles += 4;
+    cpu->clock->cpu_cycles += 4;
 }
 
 void bpl_10(struct cpu_t* cpu) {
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers->pc);
     printf("[$%04x] bpl *%+d\n", cpu->registers->pc, arg);
     cpu->registers->pc += 1;
-    cpu->registers->pc += arg;
-    cpu->clock.cpu_cycles += 2;
+    bool negative = !is_flag_set(cpu->registers->p, CPU_STATUS_NEGATIVE);
+    cpu->registers->pc += arg * negative;
+    cpu->clock->cpu_cycles += 2;
+}
+
+void cmp_c5(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers->pc);
+    printf("[$%04x] cmp $%02x\n", cpu->registers->pc, arg);
+    cpu->registers->pc += 1;
+    byte value = cpu_memory_read_byte(cpu, arg);
+    word result = (word)cpu->registers->a - (word)value;
+    set_n(cpu, result & 0xFF);
+    set_z(cpu, result & 0xFF);
+    set_c(cpu, result);
+    cpu->clock->cpu_cycles += 3;
 }
 
 void lda_a9(struct cpu_t* cpu) {
@@ -77,7 +103,7 @@ void lda_a9(struct cpu_t* cpu) {
     cpu->registers->pc += 1;
     set_n(cpu, arg);
     set_z(cpu, arg);
-    cpu->clock.cpu_cycles += 2;
+    cpu->clock->cpu_cycles += 2;
 }
 
 void jsr_20(struct cpu_t* cpu) {
@@ -86,7 +112,14 @@ void jsr_20(struct cpu_t* cpu) {
     cpu->registers->pc += 2;
     stack_push_word(cpu, cpu->registers->pc);
     cpu->registers->pc = arg;
-    cpu->clock.cpu_cycles += 6;
+    cpu->clock->cpu_cycles += 6;
+}
+
+void rts_60(struct cpu_t* cpu) {
+    printf("[$%04x] rts\n", cpu->registers->pc);
+    word address = stack_pull_word(cpu);
+    cpu->registers->pc = address;
+    cpu->clock->cpu_cycles += 6;
 }
 
 void sei_78(struct cpu_t* cpu) {
@@ -94,7 +127,15 @@ void sei_78(struct cpu_t* cpu) {
     byte p = cpu->registers->p;
     p = set_flag(p, CPU_STATUS_INTERRUPT);
     cpu->registers->p = p;
-    cpu->clock.cpu_cycles += 2;
+    cpu->clock->cpu_cycles += 2;
+}
+
+void sta_85(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers->pc);
+    printf("[$%04x] sta $%02x\n", cpu->registers->pc, arg);
+    cpu->registers->pc += 1;
+    cpu_memory_write_byte(cpu, arg, cpu->registers->a);
+    cpu->clock->cpu_cycles += 3;
 }
 
 void sta_8d(struct cpu_t* cpu) {
@@ -102,5 +143,5 @@ void sta_8d(struct cpu_t* cpu) {
     printf("[$%04x] sta $%04x\n", cpu->registers->pc, arg);
     cpu->registers->pc += 2;
     cpu_memory_write_byte(cpu, arg, cpu->registers->a);
-    cpu->clock.cpu_cycles += 2;
+    cpu->clock->cpu_cycles += 2;
 }

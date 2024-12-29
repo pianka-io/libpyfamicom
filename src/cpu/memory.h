@@ -8,6 +8,10 @@
 typedef struct cpu_memory_t {
     byte* data;
     bool mirrored;
+    bool ppuscroll_read;
+    bool ppuscroll_write;
+    bool ppuaddr_read;
+    bool ppuaddr_write;
 } cpu_memory_t;
 
 struct cpu_memory_t* cpu_memory_create(struct rom_t* rom);

@@ -6,7 +6,9 @@
 #include "ines/rom.h"
 
 typedef struct emu_t {
+    struct nes_clock_t* clock;
     struct cpu_t* cpu;
+    struct ppu_t* ppu;
 } emu_t;
 
 struct emu_t* emu_create(struct rom_t* rom);

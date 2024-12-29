@@ -4,6 +4,7 @@
 #include "ines/rom.h"
 #include "com/clock.h"
 #include "com/globals.h"
+#include "ppu/ppu.h"
 
 typedef struct cpu_registers_t {
     byte a;
@@ -15,12 +16,13 @@ typedef struct cpu_registers_t {
 } cpu_registers_t;
 
 typedef struct cpu_t {
-    struct clock_t clock;
+    struct nes_clock_t* clock;
     struct cpu_registers_t* registers;
     struct cpu_memory_t* memory;
+    struct ppu_t* ppu;
 } cpu_t;
 
-struct cpu_t* cpu_create(struct rom_t* rom);
+struct cpu_t* cpu_create(struct nes_clock_t*, struct rom_t*, struct ppu_t*);
 void cpu_destroy(struct cpu_t*);
 void cpu_tick(struct cpu_t*);
 

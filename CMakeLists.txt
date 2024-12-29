@@ -21,6 +21,8 @@ set(SOURCES
     ${SRC_DIR}/cpu/stack.c
     ${SRC_DIR}/emu/emu.c
     ${SRC_DIR}/ines/rom.c
+    ${SRC_DIR}/ppu/memory.c
+    ${SRC_DIR}/ppu/ppu.c
 )
 
 add_library(pytendo SHARED ${SOURCES})
