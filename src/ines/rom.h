@@ -1,5 +1,5 @@
-#ifndef pyfamicom_rom_h
-#define pyfamicom_rom_h
+#ifndef pytendo_rom_h
+#define pytendo_rom_h
 
 #include <stdint.h>
 #include <stddef.h>

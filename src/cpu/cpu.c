@@ -1,7 +1,8 @@
 #include <stdlib.h>
 
 #include "cpu/cpu.h"
-#include "memory.h"
+#include "cpu/memory.h"
+#include "com/constants.h"
 
 struct cpu_t* cpu_create(struct rom_t* rom) {
     struct cpu_t* cpu = (struct cpu_t*)calloc(1, sizeof(struct cpu_t));
@@ -10,6 +11,8 @@ struct cpu_t* cpu_create(struct rom_t* rom) {
 
     cpu->registers = registers;
     cpu->memory = memory;
+
+    cpu->registers->pc = cpu_memory_read_word(cpu, RESET_VECTOR);
 
     return cpu;
 }

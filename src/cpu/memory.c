@@ -22,10 +22,16 @@ void cpu_memory_destroy(struct cpu_memory_t* memory) {
     free(memory);
 }
 
-uint8_t cpu_memory_read(struct cpu_t* cpu, uint16_t address) {
+uint8_t cpu_memory_read_byte(struct cpu_t* cpu, uint16_t address) {
     return cpu->memory->data[address];
 }
 
-void cpu_memory_write(struct cpu_t* cpu, uint16_t address, uint8_t value) {
+uint16_t cpu_memory_read_word(struct cpu_t* cpu, uint16_t address) {
+    uint8_t low_byte = cpu->memory->data[address];
+    uint8_t high_byte = cpu->memory->data[address + 1];
+    return (uint16_t)(high_byte << 8 | low_byte);
+}
+
+void cpu_memory_write_byte(struct cpu_t* cpu, uint16_t address, uint8_t value) {
     cpu->memory->data[address] = value;
 }

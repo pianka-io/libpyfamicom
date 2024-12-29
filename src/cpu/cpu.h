@@ -1,5 +1,5 @@
-#ifndef pyfamicom_cpu_h
-#define pyfamicom_cpu_h
+#ifndef pytendo_cpu_h
+#define pytendo_cpu_h
 
 #include "ines/rom.h"
 
@@ -9,7 +9,7 @@ typedef struct cpu_registers_t {
     uint8_t y;
     uint8_t p;
     uint8_t sp;
-    uint8_t pc;
+    uint16_t pc;
 } cpu_registers_t;
 
 typedef struct cpu_t {

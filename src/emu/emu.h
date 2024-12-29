@@ -1,5 +1,5 @@
-#ifndef pyfamicom_emu_h
-#define pyfamicom_emu_h
+#ifndef pytendo_emu_h
+#define pytendo_emu_h
 
 #include <stdint.h>
 #include "cpu/cpu.h"
