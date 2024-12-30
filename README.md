@@ -1,1 +1,1 @@
-![pytendo](https://github.com/user-attachments/assets/20ed924e-cbda-43b1-b627-476f69412ae6)
+![pyntendo](https://github.com/user-attachments/assets/bb6ec690-c390-492f-819d-5d91ca2142ff)
