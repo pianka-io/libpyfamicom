@@ -10,7 +10,7 @@ void stack_push_byte(struct cpu_t* cpu, byte value) {
 
 byte stack_pull_byte(struct cpu_t* cpu) {
     cpu->registers->sp += 1;
-    return cpu_memory_read_byte(cpu, cpu->registers->sp);
+    return cpu_memory_read_byte(cpu, STACK_OFFSET + cpu->registers->sp);
 }
 
 void stack_push_word(struct cpu_t* cpu, word value) {

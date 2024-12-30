@@ -21,8 +21,12 @@ void ppu_destroy(struct ppu_t* ppu) {
 }
 
 void ppu_tick(struct ppu_t* ppu) {
-    ppu->clock->ppu_cycles += 2273;
-    ppu->registers->ppustatus |= PPUSTATUS_VBLANK;
-    ppu->nmi->active = true;
-    ppu->clock->ppu_cycles += 84514;
+    if (is_flag_set(ppu->registers->ppustatus, PPUSTATUS_VBLANK)) {
+        ppu->registers->ppustatus &= ~PPUSTATUS_VBLANK;
+        ppu->clock->ppu_cycles += 84514;
+    } else {
+        ppu->nmi->active = true;
+        ppu->registers->ppustatus |= PPUSTATUS_VBLANK;
+        ppu->clock->ppu_cycles += 2273;
+    }
 }
