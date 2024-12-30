@@ -17,10 +17,18 @@ typedef struct ppu_registers_t {
     byte oamdma;
 } ppu_registers_t;
 
+typedef struct ppu_state_t {
+    byte vram_increment;
+    word name_table_offset;
+    word sprite_pattern_table;
+    word background_pattern_table;
+} ppu_state_t;
+
 typedef struct ppu_t {
     struct nes_clock_t* clock;
     struct ppu_registers_t* registers;
     struct ppu_memory_t* memory;
+    struct ppu_state_t* state;
     struct interrupt_t* nmi;
 } ppu_t;
 

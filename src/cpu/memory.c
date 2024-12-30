@@ -2,8 +2,9 @@
 #include <string.h>
 #include <printf.h>
 
-#include "memory.h"
 #include "com/globals.h"
+#include "cpu/memory.h"
+#include "ppu/memory.h"
 
 word translate_cpu_address(struct cpu_t*, word);
 
@@ -57,7 +58,7 @@ byte cpu_memory_read_byte(struct cpu_t* cpu, word address) {
         case PPU_REGISTER_PPUDATA:
             return cpu->ppu->registers->ppudata;
         case PPU_REGISTER_OAMDMA:
-            return cpu->ppu->registers->oamdata;
+            return cpu->ppu->registers->oamdma;
         default:
             address = translate_cpu_address(cpu, address);
             return cpu->memory->data[address];
@@ -76,6 +77,19 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
     switch (address) {
         case PPU_REGISTER_PPUCTRL:
             cpu->ppu->registers->ppuctrl = value;
+            // name table
+            byte name_table = cpu->ppu->registers->ppuctrl & 0b11;
+            cpu->ppu->state->name_table_offset = NAME_TABLE_OFFSETS[name_table];
+            // sprite pattern table
+            cpu->ppu->state->sprite_pattern_table = PATTERN_TABLE_OFFSETS[is_flag_set(
+                cpu->ppu->registers->ppuctrl,
+                PPUCTRL_SPRITE_PATTERN_TABLE
+            )];
+            // background pattern table
+            cpu->ppu->state->background_pattern_table = PATTERN_TABLE_OFFSETS[is_flag_set(
+                    cpu->ppu->registers->ppuctrl,
+                    PPUCTRL_BACKGROUND_PATTERN_TABLE
+            )];
             break;
         case PPU_REGISTER_PPUMASK:
             cpu->ppu->registers->ppumask = value;
@@ -101,9 +115,16 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
             break;
         case PPU_REGISTER_PPUDATA:
             cpu->ppu->registers->ppudata = value;
+            ppu_memory_write_byte(
+                cpu->ppu,
+                cpu->ppu->registers->ppuaddr,
+                cpu->ppu->registers->ppudata
+            );
+            cpu->ppu->registers->ppuaddr += cpu->ppu->state->vram_increment;
+            printf("[$%04x] $%02x\n", cpu->ppu->registers->ppuaddr, cpu->ppu->registers->ppudata);
             break;
         case PPU_REGISTER_OAMDMA:
-            cpu->ppu->registers->oamdata = value;
+            cpu->ppu->registers->oamdma = value;
             break;
         default:
             cpu->memory->data[address] = value;
