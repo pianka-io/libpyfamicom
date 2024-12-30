@@ -8,8 +8,9 @@
 struct emu_t* emu_create(struct rom_t* rom) {
     struct emu_t* emu = (struct emu_t*)calloc(1, sizeof(struct emu_t));
     struct nes_clock_t* clock = clock_create();
-    struct ppu_t* ppu = ppu_create(clock);
-    struct cpu_t* cpu = cpu_create(clock, rom, ppu);
+    struct interrupt_t* nmi = interrupt_create();
+    struct ppu_t* ppu = ppu_create(clock, nmi);
+    struct cpu_t* cpu = cpu_create(clock, rom, ppu, nmi);
 
     emu->clock = clock;
     emu->cpu = cpu;

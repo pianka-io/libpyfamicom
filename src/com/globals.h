@@ -19,6 +19,7 @@ static const size_t PRG_ROM_OFFSET = 0x8000;
 static const size_t PRG_RAM_BANK_SIZE = 0x4000;
 
 static const word RESET_VECTOR = 0xFFFC;
+static const word NMI_VECTOR = 0xFFFA;
 static const word STACK_OFFSET = 0x01FF;
 
 static const byte CPU_STATUS_CARRY = 0b00000001;

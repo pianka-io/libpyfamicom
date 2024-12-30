@@ -15,6 +15,7 @@ set(SOURCES
     ${SRC_DIR}/app/main.c
     ${SRC_DIR}/com/clock.c
     ${SRC_DIR}/com/globals.c
+    ${SRC_DIR}/com/interrupt.c
     ${SRC_DIR}/cpu/cpu.c
     ${SRC_DIR}/cpu/memory.c
     ${SRC_DIR}/cpu/opcodes.c

@@ -72,6 +72,7 @@ word cpu_memory_read_word(struct cpu_t* cpu, word address) {
 }
 
 void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
+//    printf("[write] $%04x:$%02x\n", address, value);
     switch (address) {
         case PPU_REGISTER_PPUCTRL:
             cpu->ppu->registers->ppuctrl = value;
