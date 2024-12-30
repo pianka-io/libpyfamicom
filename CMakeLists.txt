@@ -11,7 +11,18 @@ set(SRC_DIR src)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR})
 
+set(Python3_EXECUTABLE /opt/homebrew/bin/python3.13)
+find_package(Python3 COMPONENTS Development NumPy REQUIRED)
+
+message(STATUS "Python Executable: ${Python3_EXECUTABLE}")
+message(STATUS "Python Include Dirs: ${Python3_INCLUDE_DIRS}")
+message(STATUS "Python Libraries: ${Python3_LIBRARIES}")
+
+include_directories(${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS})
+link_directories(${Python3_LIBRARY_DIRS})
+
 set(SOURCES
+    ${SRC_DIR}/example.c
     ${SRC_DIR}/app/main.c
     ${SRC_DIR}/com/clock.c
     ${SRC_DIR}/com/globals.c
@@ -27,10 +38,17 @@ set(SOURCES
 )
 
 add_library(pytendo SHARED ${SOURCES})
-set_target_properties(pytendo PROPERTIES OUTPUT_NAME "libpytendo")
+set_target_properties(pytendo PROPERTIES OUTPUT_NAME "pytendo" PREFIX "" SUFFIX ".cpython-313-darwin.so")
+target_include_directories(pytendo PUBLIC ${SRC_DIR})
+target_link_libraries(pytendo ${Python3_LIBRARIES})
+add_custom_command(
+        TARGET pytendo POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        $<TARGET_FILE:pytendo>
+        ${CMAKE_SOURCE_DIR}/api/
+)
 
 add_executable(pytendo_exec ${SOURCES})
 set_target_properties(pytendo_exec PROPERTIES OUTPUT_NAME "pytendo")
-
-target_include_directories(pytendo PUBLIC ${SRC_DIR})
 target_include_directories(pytendo_exec PUBLIC ${SRC_DIR})
+target_link_libraries(pytendo_exec ${Python3_LIBRARIES})
