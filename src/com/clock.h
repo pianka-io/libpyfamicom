@@ -13,6 +13,8 @@ typedef struct nes_clock_t {
 struct nes_clock_t* clock_create();
 void clock_destroy(struct nes_clock_t*);
 
-bool clock_ppu_ready(struct nes_clock_t*);
+static inline bool clock_ppu_ready(struct nes_clock_t* clock) {
+    return clock->ppu_cycles < (clock->cpu_cycles * 3);
+}
 
 #endif

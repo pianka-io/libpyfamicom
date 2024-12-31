@@ -9,7 +9,3 @@ struct nes_clock_t* clock_create(){
 void clock_destroy(struct nes_clock_t* clock) {
     free(clock);
 }
-
-bool clock_ppu_ready(struct nes_clock_t* clock) {
-    return clock->ppu_cycles < (clock->cpu_cycles * 3);
-}

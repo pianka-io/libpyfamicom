@@ -3,7 +3,10 @@ cmake_minimum_required(VERSION 3.10)
 project(pytendo C)
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -fPIC -march=armv8-a")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -fPIC -O3 -march=native")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math -finline-functions -funroll-loops")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=native -mtune=native")
+set(CMAKE_BUILD_TYPE Release)
 
 set(BUILD_DIR ${CMAKE_BINARY_DIR}/build)
 set(SRC_DIR src)
@@ -22,7 +25,7 @@ include_directories(${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS})
 link_directories(${Python3_LIBRARY_DIRS})
 
 set(SOURCES
-    ${SRC_DIR}/example.c
+    ${SRC_DIR}/api/api.c
     ${SRC_DIR}/app/main.c
     ${SRC_DIR}/com/clock.c
     ${SRC_DIR}/com/globals.c

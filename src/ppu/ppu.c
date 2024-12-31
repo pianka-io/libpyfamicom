@@ -1,4 +1,5 @@
 #include <stdlib.h>
+
 #include "ppu/ppu.h"
 #include "memory.h"
 
@@ -19,6 +20,9 @@ struct ppu_t* ppu_create(struct nes_clock_t* clock, struct interrupt_t* nmi) {
     state->sprite_pattern_table = PATTERN_TABLE_OFFSETS[0];
     state->background_pattern_table = PATTERN_TABLE_OFFSETS[0];
 
+    state->line = 261;
+    state->pixel = 0;
+
     return ppu;
 }
 
@@ -30,12 +34,36 @@ void ppu_destroy(struct ppu_t* ppu) {
 }
 
 void ppu_tick(struct ppu_t* ppu) {
-    if (is_flag_set(ppu->registers->ppustatus, PPUSTATUS_VBLANK)) {
+    uint16_t line = ppu->state->line;
+    uint16_t pixel = ppu->state->pixel;
+
+    if (line == PPU_PHASE_PRERENDER) {
+        // prerender
         ppu->registers->ppustatus &= ~PPUSTATUS_VBLANK;
-        ppu->clock->ppu_cycles += 84514;
-    } else {
-        ppu->nmi->active = true;
+    } else if (line <= PPU_PHASE_LINESCAN) {
+        // line scan
+    } else if (line == PPU_PHASE_VBLANK) {
+        // vblank
         ppu->registers->ppustatus |= PPUSTATUS_VBLANK;
-        ppu->clock->ppu_cycles += 2273;
+        ppu->nmi->active = true;
     }
+
+    ppu_increment(ppu, line, pixel);
+}
+
+void ppu_increment(struct ppu_t* ppu, uint16_t line, uint16_t pixel) {
+    pixel += 1;
+    if (pixel == PIXELS_PER_LINE) {
+        line += 1;
+        pixel = 0;
+        ppu->clock->ppu_cycles += 85; // hblank
+    }
+    if (line == PPU_PHASE_PRERENDER) {
+        line = 0;
+        pixel = 0;
+    }
+
+    ppu->state->line = line;
+    ppu->state->pixel = pixel;
+    ppu->clock->ppu_cycles += 1;
 }
