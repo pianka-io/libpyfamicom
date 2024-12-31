@@ -6,9 +6,9 @@ word translate_ppu_address(struct ppu_t*, word);
 
 struct ppu_memory_t* ppu_memory_create() {
     struct ppu_memory_t* memory = (struct ppu_memory_t*)calloc(1, sizeof(struct ppu_memory_t));
-    byte* data = (byte*)calloc(1, PPU_MEMORY_SIZE);
+//    byte* data = (byte*)calloc(1, PPU_MEMORY_SIZE);
 
-    memory->data = data;
+//    memory->data = data;
 
     return memory;
 }

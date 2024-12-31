@@ -1,6 +1,7 @@
 #ifndef pytendo_constants_h
 #define pytendo_constants_h
 
+#include <time.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -9,16 +10,28 @@ typedef uint8_t byte;
 typedef int8_t sbyte;
 typedef uint16_t word;
 
-bool is_flag_set(byte, byte);
-byte set_flag(byte, byte);
-byte clear_flag(byte, byte);
+static inline bool is_flag_set(byte value, byte flag) {
+    return (value & flag) == flag;
+}
 
-double get_time();
+static inline byte set_flag(byte value, byte flag) {
+    return value | flag;
+}
 
-static const size_t CPU_MEMORY_SIZE = 0x10000;
-static const size_t PPU_MEMORY_SIZE = 0x4000;
-static const size_t PRG_ROM_OFFSET = 0x8000;
-static const size_t PRG_RAM_BANK_SIZE = 0x4000;
+static inline byte clear_flag(byte value, byte flag) {
+    return value & ~flag;
+}
+
+static inline double get_time() {
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    return (double)ts.tv_sec + (double)ts.tv_nsec / 1e9;
+}
+
+#define CPU_MEMORY_SIZE 0x10000
+#define PPU_MEMORY_SIZE 0x4000
+#define PRG_ROM_OFFSET 0x8000
+#define PRG_RAM_BANK_SIZE 0x4000
 
 static const word RESET_VECTOR = 0xFFFC;
 static const word NMI_VECTOR = 0xFFFA;
@@ -31,8 +44,8 @@ static const word NAME_TABLE_OFFSETS[] = {
     0x2C00,
 };
 static const word PATTERN_TABLE_OFFSETS[] = {
-        0x0000,
-        0x1000,
+    0x0000,
+    0x1000,
 };
 
 static const byte CPU_STATUS_CARRY = 0b00000001;

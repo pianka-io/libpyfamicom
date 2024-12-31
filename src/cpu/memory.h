@@ -6,7 +6,7 @@
 #include "cpu/cpu.h"
 
 typedef struct cpu_memory_t {
-    byte* data;
+    byte data[CPU_MEMORY_SIZE];
     bool mirrored;
     bool ppuscroll_read;
     bool ppuscroll_write;

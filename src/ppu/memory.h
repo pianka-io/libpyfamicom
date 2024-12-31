@@ -5,8 +5,7 @@
 #include "ppu/ppu.h"
 
 typedef struct ppu_memory_t {
-    byte* data;
-    bool mirrored;
+    byte data[PPU_MEMORY_SIZE];
 } ppu_memory_t;
 
 struct ppu_memory_t* ppu_memory_create();

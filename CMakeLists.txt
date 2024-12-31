@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.10)
 project(pytendo C)
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -fPIC -O3 -march=native")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -fPIC -O3")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math -finline-functions -funroll-loops")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=native -mtune=native")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -mcpu=native -mtune=native")
 set(CMAKE_BUILD_TYPE Release)
 
 set(BUILD_DIR ${CMAKE_BINARY_DIR}/build)
@@ -28,7 +28,6 @@ set(SOURCES
     ${SRC_DIR}/api/api.c
     ${SRC_DIR}/app/main.c
     ${SRC_DIR}/com/clock.c
-    ${SRC_DIR}/com/globals.c
     ${SRC_DIR}/com/interrupt.c
     ${SRC_DIR}/cpu/cpu.c
     ${SRC_DIR}/cpu/memory.c
@@ -45,10 +44,10 @@ set_target_properties(pytendo PROPERTIES OUTPUT_NAME "pytendo" PREFIX "" SUFFIX 
 target_include_directories(pytendo PUBLIC ${SRC_DIR})
 target_link_libraries(pytendo ${Python3_LIBRARIES})
 add_custom_command(
-        TARGET pytendo POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        $<TARGET_FILE:pytendo>
-        ${CMAKE_SOURCE_DIR}/api/
+    TARGET pytendo POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:pytendo>
+    ${CMAKE_SOURCE_DIR}/api/
 )
 
 add_executable(pytendo_exec ${SOURCES})
