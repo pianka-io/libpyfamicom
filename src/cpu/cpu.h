@@ -18,7 +18,6 @@ typedef struct cpu_registers_t {
 } cpu_registers_t;
 
 typedef struct cpu_t {
-    struct timer_t timer;
     struct nes_clock_t* clock;
     struct cpu_registers_t registers;
     struct cpu_memory_t* memory;

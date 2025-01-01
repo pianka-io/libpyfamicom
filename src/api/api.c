@@ -2,32 +2,77 @@
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 #include <Python.h>
-#include <numpy/arrayobject.h>
 
-#include "api/api.h"
+#include "ines/pal.h"
+#include "ines/rom.h"
+#include "emu/emu.h"
 
-static PyObject* create_numpy_array(PyObject* self, PyObject* args) {
+void emu_capsule_destructor(PyObject* capsule) {
+    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
+    if (emu) {
+        emu_destroy(emu);
+    }
+}
+
+static PyObject* create_emu(PyObject* self, PyObject* args) {
     (void)self;
-    (void)args;
-
-    npy_intp dims[1] = {3};
-    PyObject* numpy_array = PyArray_SimpleNew(1, dims, NPY_DOUBLE);
-
-    if (!numpy_array) {
-        PyErr_SetString(PyExc_RuntimeError, "Failed to create NumPy array");
+    const char* pal_filename;
+    const char* rom_filename;
+    if (!PyArg_ParseTuple(args, "ss", &pal_filename, &rom_filename)) {
         return NULL;
     }
 
-    double* data = (double*)PyArray_DATA((PyArrayObject*)numpy_array);
-    data[0] = 1.0;
-    data[1] = 2.0;
-    data[2] = 3.0;
+    //TODO memory leaking for pal and rom
+    struct pal_t* pal = pal_load(pal_filename);
+    struct rom_t* rom = rom_load(rom_filename);
+    struct emu_t* emu = emu_create(pal, rom);
 
-    return numpy_array;
+    return PyCapsule_New(emu, "emu_t", emu_capsule_destructor);
+}
+
+static PyObject* tick_emu(PyObject* self, PyObject* args) {
+    (void)self;
+    PyObject* capsule;
+
+    if (!PyArg_ParseTuple(args, "O", &capsule)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a capsule argument");
+        return NULL;
+    }
+
+    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
+    if (!emu) {
+        PyErr_SetString(PyExc_RuntimeError, "Invalid or missing emulator capsule");
+        return NULL;
+    }
+
+    emu_tick(emu);
+
+    Py_RETURN_NONE;
+}
+
+static PyObject* frame_emu(PyObject* self, PyObject* args) {
+    (void)self;
+    PyObject* capsule;
+
+    if (!PyArg_ParseTuple(args, "O", &capsule)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a capsule argument");
+        return NULL;
+    }
+
+    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
+    if (!emu) {
+        PyErr_SetString(PyExc_RuntimeError, "Invalid or missing emulator capsule");
+        return NULL;
+    }
+
+    Py_INCREF(emu->ppu->state.frame_array);
+    return emu->ppu->state.frame_array;
 }
 
 static PyMethodDef PytendoMethods[] = {
-    {"create_numpy_array", create_numpy_array, METH_NOARGS, "Create and return a NumPy array."},
+    {"create_emu", create_emu, METH_VARARGS, "Create a pytendo emulator."},
+    {"tick_emu", tick_emu, METH_VARARGS, "Tick a pytendo emulator."},
+    {"frame_emu", frame_emu, METH_VARARGS, "Get the latest frame from a pytendo emulator."},
     {NULL, NULL, 0, NULL}
 };
 
@@ -44,6 +89,6 @@ static struct PyModuleDef pytendo_module = {
 };
 
 PyMODINIT_FUNC PyInit_pytendo(void) {
-    import_array();
+    ppu_initialize_numpy();
     return PyModule_Create(&pytendo_module);
 }

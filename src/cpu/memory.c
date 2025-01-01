@@ -26,7 +26,7 @@ struct cpu_memory_t* cpu_memory_create(struct rom_t* rom) {
 }
 
 void cpu_memory_destroy(struct cpu_memory_t* memory) {
-    free(memory->data);
+//    free(memory->data);
     free(memory);
 }
 
@@ -90,6 +90,11 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
                 cpu->ppu->registers.ppuctrl,
                 PPUCTRL_BACKGROUND_PATTERN_TABLE
             )];
+            // vram increment
+            cpu->ppu->state.vram_increment = is_flag_set(
+                    cpu->ppu->registers.ppuctrl,
+                    PPUCTRL_VRAM_INCREMENT
+            ) ? 32 : 1;
             break;
         case PPU_REGISTER_PPUMASK:
             cpu->ppu->registers.ppumask = value;
@@ -120,8 +125,8 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
                 cpu->ppu->registers.ppuaddr,
                 cpu->ppu->registers.ppudata
             );
-            cpu->ppu->registers.ppuaddr += cpu->ppu->state.vram_increment;
-            printf("[$%04x] $%02x\n", cpu->ppu->registers.ppuaddr, cpu->ppu->registers.ppudata);
+//            printf("[$%04x] $%02x\n", cpu->ppu->registers.ppuaddr, cpu->ppu->registers.ppudata);
+            cpu->ppu->registers.ppuaddr = (cpu->ppu->registers.ppuaddr + cpu->ppu->state.vram_increment) & 0x3FFF;
             break;
         case PPU_REGISTER_OAMDMA:
             cpu->ppu->registers.oamdma = value;

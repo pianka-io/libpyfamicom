@@ -2,4 +2,5 @@
 bin/
 build/
 cmake-build-debug/
+api/bin/
 api/pytendo.cpython*.so

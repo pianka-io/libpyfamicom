@@ -8,12 +8,9 @@
 
 struct cpu_t* cpu_create(struct nes_clock_t* clock, struct rom_t* rom, struct ppu_t* ppu, struct interrupt_t* nmi) {
     struct cpu_t* cpu = (struct cpu_t*)calloc(1, sizeof(struct cpu_t));
-//    struct cpu_registers_t* registers = (struct cpu_registers_t*)calloc(1, sizeof(struct cpu_registers_t));
     struct cpu_memory_t* memory = cpu_memory_create(rom);
 
-    cpu->timer.elapsed = get_time();
     cpu->clock = clock;
-//    cpu->registers = registers;
     cpu->memory = memory;
     cpu->ppu = ppu;
     cpu->nmi = nmi;
@@ -25,16 +22,10 @@ struct cpu_t* cpu_create(struct nes_clock_t* clock, struct rom_t* rom, struct pp
 
 void cpu_destroy(struct cpu_t* cpu) {
     cpu_memory_destroy(cpu->memory);
-//    free(cpu->registers);
     free(cpu);
 }
 
 void cpu_tick(struct cpu_t* cpu) {
-    double delta = get_time() - cpu->timer.elapsed;
-    if (delta > 1.0) {
-        cpu->timer.elapsed = get_time();
-        printf("cpu %lld\n", cpu->clock->cpu_cycles);
-    }
     if (cpu->nmi->active) {
         cpu->nmi->active = false;
         stack_push_word(cpu, cpu->registers.pc);
