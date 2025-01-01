@@ -53,7 +53,7 @@ void ppu_tick(struct ppu_t* ppu) {
         ppu_prerender(ppu, line, pixel);
     } else if (line <= PPU_PHASE_LINESCAN) {
         ppu_render(ppu, line, pixel);
-    } else if (line == PPU_PHASE_VBLANK) {
+    } else if (line == PPU_PHASE_VBLANK && pixel == 1) {
         ppu->registers.ppustatus |= PPUSTATUS_VBLANK;
         ppu->nmi->active = true;
         ppu->nmi->done = true;

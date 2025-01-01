@@ -57,7 +57,7 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0xEA: nop_ea(cpu); break;
         case 0xEE: inc_ee(cpu); break;
         default:
-            //printf("[$%04x] unknown opcode $%02x\n", pc, opcode);
+            printf("[$%04x] unknown opcode $%02x\n", pc, opcode);
             exit(0);
     }
 }
@@ -80,9 +80,7 @@ static inline void set_c(struct cpu_t* cpu, word value) {
 /* opcodes */
 void adc_69(struct cpu_t* cpu) {
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
-    if (arg != -2) {
-        //printf("[$%04x] adc #%+d\n", cpu->registers.pc, arg);
-    }
+    //printf("[$%04x] adc #%+d\n", cpu->registers.pc, arg);
     cpu->registers.pc += 1;
     bool carry = is_flag_set(cpu->registers.p, CPU_STATUS_CARRY);
     word result = (word)cpu->registers.a + arg + (word)carry;
@@ -113,7 +111,6 @@ void bcc_90(struct cpu_t* cpu) {
     word original_pc = cpu->registers.pc + 1;
     //printf("[$%04x] bcc *%+d\n", cpu->registers.pc, arg);
     cpu->registers.pc += 1;
-    //printf("  c %i \n", is_flag_set(cpu->registers.p, CPU_STATUS_CARRY));
     if (!is_flag_set(cpu->registers.p, CPU_STATUS_CARRY)) {
         word new_pc = cpu->registers.pc + arg;
         cpu->clock->cpu_cycles += 1;
@@ -157,9 +154,7 @@ void bit_2c(struct cpu_t* cpu) {
 void bne_d0(struct cpu_t* cpu) {
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
     word original_pc = cpu->registers.pc + 1;
-    if (arg != -5) {
-        //printf("[$%04x] bne *%+d\n", cpu->registers.pc, arg);
-    }
+    //printf("[$%04x] bne *%+d\n", cpu->registers.pc, arg);
     cpu->registers.pc += 1;
     if (!is_flag_set(cpu->registers.p, CPU_STATUS_ZERO)) {
         word new_pc = cpu->registers.pc + arg;
@@ -203,11 +198,10 @@ void cmp_c5(struct cpu_t* cpu) {
     word result = (word)cpu->registers.a - (word)value;
     set_n(cpu, result & 0xFF);
     set_z(cpu, result & 0xFF);
-//    set_c(cpu, result);
     if (cpu->registers.a >= arg) {
-        cpu->registers.p |= CPU_STATUS_CARRY;  // Set the carry flag
+        cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
-        cpu->registers.p &= ~CPU_STATUS_CARRY; // Clear the carry flag
+        cpu->registers.p &= ~CPU_STATUS_CARRY;
     }
     cpu->clock->cpu_cycles += 3;
 }
@@ -219,13 +213,11 @@ void cmp_c9(struct cpu_t* cpu) {
     word result = (word)cpu->registers.a - (word)arg;
     set_n(cpu, result & 0xFF);
     set_z(cpu, result & 0xFF);
-//    set_c(cpu, result);
     if (cpu->registers.a >= arg) {
-        cpu->registers.p |= CPU_STATUS_CARRY;  // Set the carry flag
+        cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
-        cpu->registers.p &= ~CPU_STATUS_CARRY; // Clear the carry flag
+        cpu->registers.p &= ~CPU_STATUS_CARRY;
     }
-    //printf("  c %i \n", is_flag_set(cpu->registers.p, CPU_STATUS_CARRY));
     cpu->clock->cpu_cycles += 2;
 }
 
@@ -237,11 +229,10 @@ void cmp_cd(struct cpu_t* cpu) {
     word result = (word)cpu->registers.a - (word)value;
     set_n(cpu, result & 0xFF);
     set_z(cpu, result & 0xFF);
-//    set_c(cpu, result);
     if (cpu->registers.a >= arg) {
-        cpu->registers.p |= CPU_STATUS_CARRY;  // Set the carry flag
+        cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
-        cpu->registers.p &= ~CPU_STATUS_CARRY; // Clear the carry flag
+        cpu->registers.p &= ~CPU_STATUS_CARRY;
     }
     cpu->clock->cpu_cycles += 4;
 }
@@ -326,7 +317,7 @@ void lda_a5(struct cpu_t* cpu) {
     //printf("[$%04x] lda $%02x\n", cpu->registers.pc, arg);
     cpu->registers.pc += 1;
     byte value = cpu_memory_read_byte(cpu, arg);
-    //printf("  wut: %i\n", value);
+    //printf("        value $%02x\n", value);
     cpu->registers.a = value;
     set_n(cpu, value);
     set_z(cpu, value);
