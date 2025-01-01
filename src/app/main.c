@@ -12,7 +12,6 @@ int main() {
 
     while (true) {
         emu_tick(emu);
-        printf("frame\n");
     }
 
     pal_destroy(pal);

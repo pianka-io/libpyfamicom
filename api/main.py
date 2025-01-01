@@ -12,7 +12,9 @@ WIDTH, HEIGHT = 256, 240
 screen = pygame.display.set_mode((WIDTH * SCALE, HEIGHT * SCALE))
 
 np.set_printoptions(threshold=10**6)
-#
+
+##
+
 # for _ in range(10000):
 #     pytendo.tick_emu(emu)
 # frame = pytendo.frame_emu(emu)
@@ -25,7 +27,8 @@ np.set_printoptions(threshold=10**6)
 #             print("X", end="")
 #         # print(row, end="")
 #     print()
-#
+
+##
 
 frames = 0
 last = time.perf_counter()
