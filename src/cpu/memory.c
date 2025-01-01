@@ -78,7 +78,7 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
         case PPU_REGISTER_PPUCTRL:
             cpu->ppu->registers.ppuctrl = value;
             // name table
-            byte name_table = cpu->ppu->registers.ppuctrl & 0b11;
+            byte name_table = cpu->ppu->registers.ppuctrl & PPUCTRL_BASE_NAME_TABLE;
             cpu->ppu->state.name_table_offset = NAME_TABLE_OFFSETS[name_table];
             // sprite pattern table
             cpu->ppu->state.sprite_pattern_table = PATTERN_TABLE_OFFSETS[is_flag_set(
@@ -87,8 +87,8 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
             )];
             // background pattern table
             cpu->ppu->state.background_pattern_table = PATTERN_TABLE_OFFSETS[is_flag_set(
-                    cpu->ppu->registers.ppuctrl,
-                    PPUCTRL_BACKGROUND_PATTERN_TABLE
+                cpu->ppu->registers.ppuctrl,
+                PPUCTRL_BACKGROUND_PATTERN_TABLE
             )];
             break;
         case PPU_REGISTER_PPUMASK:
