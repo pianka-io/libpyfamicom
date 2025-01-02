@@ -13,6 +13,8 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
 
     switch (opcode) {
         case 0x06: asl_06(cpu); break;
+        case 0x08: php_08(cpu); break;
+        case 0x09: ora_09(cpu); break;
         case 0x0A: asl_0a(cpu); break;
         case 0x10: bpl_10(cpu); break;
         case 0x18: clc_18(cpu); break;
@@ -25,11 +27,14 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0x30: bmi_30(cpu); break;
         case 0x38: sec_38(cpu); break;
         case 0x40: rti_40(cpu); break;
+        case 0x45: eor_45(cpu); break;
+        case 0x46: lsr_46(cpu); break;
         case 0x48: pha_48(cpu); break;
         case 0x49: eor_49(cpu); break;
         case 0x4A: lsr_4a(cpu); break;
         case 0x4C: jmp_4c(cpu); break;
         case 0x60: rts_60(cpu); break;
+        case 0x66: ror_66(cpu); break;
         case 0x68: pla_68(cpu); break;
         case 0x69: adc_69(cpu); break;
         case 0x6A: ror_6a(cpu); break;
@@ -73,7 +78,7 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0xEE: inc_ee(cpu); break;
         case 0xF0: beq_f0(cpu); break;
         default:
-            printf("[$%04x] unknown opcode $%02x\n", pc, opcode);
+            //printf("[$%04x] unknown opcode $%02x\n", pc, opcode);
             exit(0);
     }
 }
@@ -373,9 +378,20 @@ void dey_88(struct cpu_t* cpu) {
     cpu->clock->cpu_cycles += 2;
 }
 
-void eor_49(struct cpu_t* cpu) {
+void eor_45(struct cpu_t* cpu) {
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     //printf("[$%04x] eor $%02x\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    byte value = cpu_memory_read_byte(cpu, arg);
+    cpu->registers.a = cpu->registers.a ^ value;
+    set_n(cpu, cpu->registers.a);
+    set_z(cpu, cpu->registers.a);
+    cpu->clock->cpu_cycles += 3;
+}
+
+void eor_49(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
+    //printf("[$%04x] eor #$%02x\n", cpu->registers.pc, arg);
     cpu->registers.pc += 1;
     cpu->registers.a = cpu->registers.a ^ arg;
     set_n(cpu, cpu->registers.a);
@@ -497,7 +513,7 @@ void ldx_a2(struct cpu_t* cpu) {
 
 void ldx_a6(struct cpu_t* cpu) {
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
-    //printf("[$%04x] ldx #$%02x\n", cpu->registers.pc, arg);
+    //printf("[$%04x] ldx $%02x\n", cpu->registers.pc, arg);
     cpu->registers.pc += 1;
     byte value = cpu_memory_read_byte(cpu, arg);
     cpu->registers.x = value;
@@ -516,14 +532,31 @@ void ldy_a0(struct cpu_t* cpu) {
     cpu->clock->cpu_cycles += 2;
 }
 
-void lsr_4a(struct cpu_t* cpu) {
-    //printf("[$%04x] lsr\n", cpu->registers.pc);
-    uint8_t result = cpu->registers.a >> 1;
-    if (cpu->registers.a & CPU_STATUS_CARRY) {
+void lsr_46(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
+    //printf("[$%04x] lsr $%02x\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    byte value = cpu_memory_read_byte(cpu, arg);
+    if (value & 0x01) {
         cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
         cpu->registers.p &= ~CPU_STATUS_CARRY;
     }
+    byte result = value >> 1;
+    cpu_memory_write_byte(cpu, arg, result);
+    set_n(cpu, result);
+    set_z(cpu, result);
+    cpu->clock->cpu_cycles += 5;
+}
+
+void lsr_4a(struct cpu_t* cpu) {
+    //printf("[$%04x] lsr\n", cpu->registers.pc);
+    if (cpu->registers.a & 0x01) {
+        cpu->registers.p |= CPU_STATUS_CARRY;
+    } else {
+        cpu->registers.p &= ~CPU_STATUS_CARRY;
+    }
+    uint8_t result = cpu->registers.a >> 1;
     cpu->registers.a = result;
     set_n(cpu, result);
     set_z(cpu, result);
@@ -532,11 +565,12 @@ void lsr_4a(struct cpu_t* cpu) {
 
 void jmp_4c(struct cpu_t* cpu) {
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
-    if (arg != 0xe4f0) {
-        //printf("[$%04x] jmp $%04x\n", cpu->registers.pc, arg);
-    }
+    //printf("[$%04x] jmp $%04x\n", cpu->registers.pc, arg);
     cpu->registers.pc = arg;
     cpu->clock->cpu_cycles += 3;
+    if (arg == 0xe60f) {
+//        exit(0);
+    }
 }
 
 void jsr_20(struct cpu_t* cpu) {
@@ -553,9 +587,26 @@ void nop_ea(struct cpu_t* cpu) {
     cpu->clock->cpu_cycles += 2;
 }
 
+void ora_09(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
+    //printf("[$%04x] ora #$%02x\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    cpu->registers.a = cpu->registers.a | arg;
+    set_n(cpu, cpu->registers.a);
+    set_z(cpu, cpu->registers.a);
+    cpu->clock->cpu_cycles += 2;
+}
+
 void pha_48(struct cpu_t* cpu) {
     //printf("[$%04x] pha\n", cpu->registers.pc);
     stack_push_byte(cpu, cpu->registers.a);
+    cpu->clock->cpu_cycles += 3;
+}
+
+void php_08(struct cpu_t* cpu) {
+    //printf("[$%04x] php\n", cpu->registers.pc);
+    byte value = cpu->registers.p | CPU_STATUS_BREAK | CPU_STATUS_UNUSED;
+    stack_push_byte(cpu, value);
     cpu->clock->cpu_cycles += 3;
 }
 
@@ -568,13 +619,13 @@ void pla_68(struct cpu_t* cpu) {
 }
 
 void plp_68(struct cpu_t* cpu) {
-    // printf("[$%04x] plp\n", cpu->registers.pc);
+    //printf("[$%04x] plp\n", cpu->registers.pc);
     cpu->registers.p = (stack_pull_byte(cpu) & 0xEF) | 0x20;
     cpu->clock->cpu_cycles += 4;
 }
 
 void rol_2a(struct cpu_t* cpu) {
-    // printf("[$%04x] rol\n", cpu->registers.pc);
+    //printf("[$%04x] rol\n", cpu->registers.pc);
     uint8_t carry = (cpu->registers.p & CPU_STATUS_CARRY);
     uint8_t result = (cpu->registers.a << 1) | carry;
     if (cpu->registers.a & 0x80) {
@@ -588,8 +639,26 @@ void rol_2a(struct cpu_t* cpu) {
     cpu->clock->cpu_cycles += 3;
 }
 
+void ror_66(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
+    //printf("[$%04x] ror $%02x\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    byte value = cpu_memory_read_byte(cpu, arg);
+    byte carry = (cpu->registers.p & CPU_STATUS_CARRY) ? 1 : 0;
+    if (value & CPU_STATUS_CARRY) {
+        cpu->registers.p |= CPU_STATUS_CARRY;
+    } else {
+        cpu->registers.p &= ~CPU_STATUS_CARRY;
+    }
+    byte result = (value >> 1) | (carry << 7);
+    cpu_memory_write_byte(cpu, arg, result);
+    set_n(cpu, result);
+    set_z(cpu, result);
+    cpu->clock->cpu_cycles += 5;
+}
+
 void ror_6a(struct cpu_t* cpu) {
-    // printf("[$%04x] ror\n", cpu->registers.pc);
+    //printf("[$%04x] ror\n", cpu->registers.pc);
     uint8_t carry = (cpu->registers.p & CPU_STATUS_CARRY);
     uint8_t result = (cpu->registers.a >> 1) | (carry << 7);
     if (cpu->registers.a & 0x01) {
@@ -602,7 +671,6 @@ void ror_6a(struct cpu_t* cpu) {
     set_z(cpu, result);
     cpu->clock->cpu_cycles += 3;
 }
-
 
 void rti_40(struct cpu_t* cpu) {
     //printf("[$%04x] rti\n", cpu->registers.pc);
@@ -619,18 +687,18 @@ void rts_60(struct cpu_t* cpu) {
 
 void sbc_e9(struct cpu_t* cpu) {
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
-    // printf("[$%04x] sbc $%02x\n", cpu->registers.pc, arg);
+    //printf("[$%04x] sbc $%02x\n", cpu->registers.pc, arg);
     cpu->registers.pc += 1;
     uint16_t temp = cpu->registers.a - arg - ((cpu->registers.p & 0x01) ? 0 : 1);
-    if (temp <= 0xFF) {
-        cpu->registers.p |= 0x01;
+    if (temp < 0x100) {
+        cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
-        cpu->registers.p &= ~0x01;
+        cpu->registers.p &= ~CPU_STATUS_CARRY;
     }
     if ((cpu->registers.a ^ arg) & 0x80 && (cpu->registers.a ^ temp) & 0x80) {
-        cpu->registers.p |= 0x40;
+        cpu->registers.p |= CPU_STATUS_OVERFLOW;
     } else {
-        cpu->registers.p &= ~0x40;
+        cpu->registers.p &= ~CPU_STATUS_OVERFLOW;
     }
     cpu->registers.a = (byte)temp;
     set_n(cpu, cpu->registers.a);
@@ -668,10 +736,10 @@ void sta_8d(struct cpu_t* cpu) {
 
 void sta_91(struct cpu_t* cpu) {
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
-    //printf("[$%04x] sta $%04x\n", cpu->registers.pc, arg);
+    //printf("[$%04x] sta ($%04x),Y\n", cpu->registers.pc, arg);
     cpu->registers.pc += 1;
     word value = cpu_memory_read_word(cpu, arg);
-    word address = value + cpu->registers.y;
+    word address = cpu->registers.y + value;
     cpu_memory_write_byte(cpu, address, cpu->registers.a);
     cpu->clock->cpu_cycles += 6;
 }

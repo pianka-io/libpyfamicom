@@ -10,6 +10,7 @@
 #include "com/clock.h"
 #include "com/globals.h"
 #include "com/interrupt.h"
+#include "ines/rom.h"
 #include "ines/pal.h"
 
 typedef struct ppu_registers_t {
@@ -47,7 +48,7 @@ typedef struct ppu_t {
     struct pal_t* pal;
 } ppu_t;
 
-struct ppu_t* ppu_create(struct nes_clock_t*, struct interrupt_t*, struct pal_t*);
+struct ppu_t* ppu_create(struct nes_clock_t*, struct rom_t*, struct interrupt_t*, struct pal_t*);
 void* ppu_initialize_numpy();
 void ppu_frame_create(struct ppu_state_t*);
 void ppu_destroy(struct ppu_t*);

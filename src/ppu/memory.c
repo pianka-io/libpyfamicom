@@ -33,13 +33,9 @@ word translate_ppu_address(struct ppu_t* ppu, word address) {
 
         switch (ppu->state.mirroring_mode) {
             case MIRROR_HORIZONTAL:
-                return 0x2000 | (base & 0x7FF);
+                return 0x2000 | ((base & 0x800) >> 1) | (base & 0x3FF);
             case MIRROR_VERTICAL:
                 return 0x2000 | (base & 0xBFF);
-            case MIRROR_SINGLE_LOW:
-                return 0x2000 | (base & 0x3FF);
-            case MIRROR_SINGLE_HIGH:
-                return 0x2400 | (base & 0x3FF);
             default:
                 return address;
         }

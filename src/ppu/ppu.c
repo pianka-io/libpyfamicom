@@ -3,7 +3,7 @@
 #include "ppu/ppu.h"
 #include "memory.h"
 
-struct ppu_t* ppu_create(struct nes_clock_t* clock, struct interrupt_t* nmi, struct pal_t* pal) {
+struct ppu_t* ppu_create(struct nes_clock_t* clock, struct rom_t* rom, struct interrupt_t* nmi, struct pal_t* pal) {
     struct ppu_t* ppu = (struct ppu_t*)calloc(1, sizeof(struct ppu_t));
     struct ppu_memory_t* memory = ppu_memory_create();
 
@@ -19,6 +19,10 @@ struct ppu_t* ppu_create(struct nes_clock_t* clock, struct interrupt_t* nmi, str
 
     ppu->state.line = 261;
     ppu->state.pixel = 0;
+    ppu->state.mirroring_mode = is_flag_set(
+        rom->header.interface,
+        ROM_INTERFACE_MIRRORING
+    ) ? MIRROR_HORIZONTAL : MIRROR_VERTICAL;
 
     ppu_frame_create(&ppu->state);
 

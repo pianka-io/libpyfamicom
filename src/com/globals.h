@@ -18,10 +18,8 @@ typedef uint16_t word;
 #define PRG_RAM_BANK_SIZE 0x4000
 #define PALETTE_SIZE (32 * 48)
 
-#define MIRROR_HORIZONTAL 0
-#define MIRROR_VERTICAL   1
-#define MIRROR_SINGLE_LOW 2
-#define MIRROR_SINGLE_HIGH 3
+#define MIRROR_VERTICAL   0
+#define MIRROR_HORIZONTAL 1
 
 static const word FRAME_WIDTH = 256;
 static const word FRAME_HEIGHT = 240;
@@ -43,12 +41,14 @@ static const word PATTERN_TABLE_OFFSETS[] = {
     0x1000,
 };
 
+static const byte ROM_INTERFACE_MIRRORING = 0b00000001;
+
 static const byte CPU_STATUS_CARRY = 0b00000001;
 static const byte CPU_STATUS_ZERO = 0b00000010;
 static const byte CPU_STATUS_INTERRUPT = 0b00000100;
 static const byte CPU_STATUS_DECIMAL = 0b00001000;
-//static const byte CPU_STATUS_BREAK = 0b00010000;
-//static const byte CPU_STATUS_UNUSED = 0b00100000;
+static const byte CPU_STATUS_BREAK = 0b00010000;
+static const byte CPU_STATUS_UNUSED = 0b00100000;
 static const byte CPU_STATUS_OVERFLOW = 0b01000000;
 static const byte CPU_STATUS_NEGATIVE = 0b10000000;
 

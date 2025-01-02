@@ -125,7 +125,7 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
                 cpu->ppu->registers.ppuaddr,
                 cpu->ppu->registers.ppudata
             );
-//            printf("[$%04x] $%02x\n", cpu->ppu->registers.ppuaddr, cpu->ppu->registers.ppudata);
+            printf("[$%04x] $%02x\n", cpu->ppu->registers.ppuaddr, cpu->ppu->registers.ppudata);
             cpu->ppu->registers.ppuaddr = (cpu->ppu->registers.ppuaddr + cpu->ppu->state.vram_increment) & 0x3FFF;
             break;
         case PPU_REGISTER_OAMDMA:

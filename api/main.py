@@ -8,6 +8,17 @@ import pytendo
 emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/cpu_dummy_reads.nes")
 
 
+def print_frame(frame):
+    print("start")
+    for y in range(240):
+        for x in range(256):
+            r, g, b = frame[x, y, :]
+            mean = (r + g + b) / 3
+            print(f"{int(mean):02x}", end="")
+        print()
+    print("end")
+
+
 pygame.init()
 SCALE = 3
 WIDTH, HEIGHT = 256, 240
@@ -31,5 +42,7 @@ while running:
         print(f"{frames}fps")
         last = time.perf_counter()
         frames = 0
+        # print_frame(frame)
 
 pygame.quit()
+
