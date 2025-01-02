@@ -3,12 +3,14 @@
 
 word translate_ppu_address(struct ppu_t*, word);
 
-struct ppu_memory_t* ppu_memory_create() {
-    return (struct ppu_memory_t*)calloc(1, sizeof(struct ppu_memory_t));
+struct ppu_memory_t* ppu_memory_create(struct rom_t* rom) {
+    struct ppu_memory_t* memory = (struct ppu_memory_t*)calloc(1, sizeof(struct ppu_memory_t));
+    memcpy(memory->data, rom->chr_rom, rom->chr_rom_size);
+
+    return memory;
 }
 
 void ppu_memory_destroy(struct ppu_memory_t* memory) {
-//    free(memory->data);
     free(memory);
 }
 

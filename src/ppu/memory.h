@@ -8,7 +8,7 @@ typedef struct ppu_memory_t {
     byte data[PPU_MEMORY_SIZE];
 } ppu_memory_t;
 
-struct ppu_memory_t* ppu_memory_create();
+struct ppu_memory_t* ppu_memory_create(struct rom_t*);
 void ppu_memory_destroy(struct ppu_memory_t*);
 
 byte ppu_memory_read_byte(struct ppu_t*, word);

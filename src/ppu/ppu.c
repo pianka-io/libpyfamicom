@@ -5,7 +5,7 @@
 
 struct ppu_t* ppu_create(struct nes_clock_t* clock, struct rom_t* rom, struct interrupt_t* nmi, struct pal_t* pal) {
     struct ppu_t* ppu = (struct ppu_t*)calloc(1, sizeof(struct ppu_t));
-    struct ppu_memory_t* memory = ppu_memory_create();
+    struct ppu_memory_t* memory = ppu_memory_create(rom);
 
     ppu->clock = clock;
     ppu->memory = memory;
