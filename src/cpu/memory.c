@@ -10,12 +10,8 @@ word translate_cpu_address(struct cpu_t*, word);
 
 struct cpu_memory_t* cpu_memory_create(struct rom_t* rom) {
     struct cpu_memory_t* memory = (struct cpu_memory_t*)calloc(1, sizeof(struct cpu_memory_t));
+    memcpy(memory->data + PRG_ROM_OFFSET, rom->prg_rom, rom->prg_rom_size);
 
-//    byte* data = (byte*)calloc(1, CPU_MEMORY_SIZE);
-    word prg_rom_size = rom->header.prg_rom * PRG_RAM_BANK_SIZE;
-    memcpy(memory->data + PRG_ROM_OFFSET, rom->data + 0x10, prg_rom_size);
-
-//    memory->data = data;
     memory->mirrored = rom->header.prg_rom == 1;
     memory->ppuscroll_read = 1;
     memory->ppuscroll_write = 1;
@@ -26,7 +22,6 @@ struct cpu_memory_t* cpu_memory_create(struct rom_t* rom) {
 }
 
 void cpu_memory_destroy(struct cpu_memory_t* memory) {
-//    free(memory->data);
     free(memory);
 }
 
