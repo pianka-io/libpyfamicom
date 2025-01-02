@@ -2,9 +2,9 @@ import time
 
 import pygame
 import pytendo
-# emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/1.Branch_Basics.nes")
-# emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/2.Backward_branch.nes")
-# emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/3.Forward_branch.nes")
+# passed: emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/1.Branch_Basics.nes")
+# passed: emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/2.Backward_branch.nes")
+# passed: emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/3.Forward_branch.nes")
 emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/cpu_dummy_reads.nes")
 
 

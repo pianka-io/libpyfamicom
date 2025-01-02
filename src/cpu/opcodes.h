@@ -7,14 +7,19 @@ void cpu_handle_instruction(struct cpu_t*);
 
 void adc_69(struct cpu_t*); // immediate, size 2, cycles 2
 void and_29(struct cpu_t*); // immediate, size 2, cycles 2
+void asl_06(struct cpu_t*); // zero, size 2, cycles 5
+void asl_0a(struct cpu_t*); // accumulator, size 2, cycles 2
 void bcc_90(struct cpu_t*); // relative, size 2, cycles 2
 void bcs_b0(struct cpu_t*); // relative, size 2, cycles 2
 void beq_f0(struct cpu_t*); // relative, size 2, cycles 2
+void bit_24(struct cpu_t*); // zero, size 2, cycles 3
 void bit_2c(struct cpu_t*); // absolute, size 3, cycles 4
+void bmi_30(struct cpu_t*); // relative, size 2, cycles 2
 void bne_d0(struct cpu_t*); // relative, size 2, cycles 2
 void bpl_10(struct cpu_t*); // relative, size 2, cycles 2
 void clc_18(struct cpu_t*); // implicit, size 1, cycles 2
 void cld_d8(struct cpu_t*); // implicit, size 1, cycles 2
+void clv_b8(struct cpu_t*); // implicit, size 1, cycles 2
 void cmp_c5(struct cpu_t*); // zero, size 2, cycles 3
 void cmp_c9(struct cpu_t*); // immediate, size 2, cycles 2
 void cmp_cd(struct cpu_t*); // absolute, size 3, cycles 4
@@ -40,6 +45,7 @@ void jsr_20(struct cpu_t*); // absolute, size 3, cycles 6
 void nop_ea(struct cpu_t*); // implicit, size 1, cycles 2
 void pha_48(struct cpu_t*); // implicit, size 1, cycles 3
 void pla_68(struct cpu_t*); // implicit, size 1, cycles 4
+void plp_68(struct cpu_t*); // implicit, size 1, cycles 4
 void rol_2a(struct cpu_t*); // accumulator, size 1, cycles 2
 void ror_6a(struct cpu_t*); // accumulator, size 1, cycles 2
 void rti_40(struct cpu_t*); // implicit, size 1, cycles 6

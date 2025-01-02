@@ -12,12 +12,17 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
     cpu->registers.pc += 1;
 
     switch (opcode) {
+        case 0x06: asl_06(cpu); break;
+        case 0x0A: asl_0a(cpu); break;
         case 0x10: bpl_10(cpu); break;
         case 0x18: clc_18(cpu); break;
         case 0x20: jsr_20(cpu); break;
+        case 0x24: bit_24(cpu); break;
+        case 0x28: plp_68(cpu); break;
         case 0x29: and_29(cpu); break;
         case 0x2A: rol_2a(cpu); break;
         case 0x2C: bit_2c(cpu); break;
+        case 0x30: bmi_30(cpu); break;
         case 0x38: sec_38(cpu); break;
         case 0x40: rti_40(cpu); break;
         case 0x48: pha_48(cpu); break;
@@ -51,6 +56,7 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0xAD: lda_ad(cpu); break;
         case 0xB0: bcs_b0(cpu); break;
         case 0xB1: lda_b1(cpu); break;
+        case 0xB8: clv_b8(cpu); break;
         case 0xBD: lda_bd(cpu); break;
         case 0xC5: cmp_c5(cpu); break;
         case 0xC9: cmp_c9(cpu); break;
@@ -116,6 +122,40 @@ void and_29(struct cpu_t* cpu) {
     cpu->clock->cpu_cycles += 2;
 }
 
+void asl_06(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
+    //printf("[$%04x] asl %+d\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    byte value = cpu_memory_read_byte(cpu, arg);
+    byte result = value << 1;
+    if (value & 0x80) {
+        cpu->registers.p |= CPU_STATUS_CARRY;
+    } else {
+        cpu->registers.p &= ~CPU_STATUS_CARRY;
+    }
+    cpu_memory_write_byte(cpu, arg, result);
+    set_n(cpu, result);
+    set_z(cpu, result);
+    cpu->clock->cpu_cycles += 5;
+}
+
+void asl_0a(struct cpu_t* cpu) {
+    //printf("[$%04x] asl\n", cpu->registers.pc);
+    uint8_t result = cpu->registers.a << 1;
+
+    if (cpu->registers.a & 0x80) {
+        cpu->registers.p |= CPU_STATUS_CARRY;
+    } else {
+        cpu->registers.p &= ~CPU_STATUS_CARRY;
+    }
+
+    cpu->registers.a = result;
+    set_n(cpu, result);
+    set_z(cpu, result);
+
+    cpu->clock->cpu_cycles += 2;
+}
+
 void bcc_90(struct cpu_t* cpu) {
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
     word original_pc = cpu->registers.pc + 1;
@@ -164,6 +204,19 @@ void beq_f0(struct cpu_t* cpu) {
     cpu->clock->cpu_cycles += 2;
 }
 
+void bit_24(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
+    //printf("[$%04x] bit $%02x\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    byte value = cpu_memory_read_byte(cpu, arg);
+    byte nv = value & (CPU_STATUS_NEGATIVE | CPU_STATUS_OVERFLOW);
+    byte p = cpu->registers.p & ~(CPU_STATUS_NEGATIVE | CPU_STATUS_OVERFLOW);
+    cpu->registers.p = p | nv;
+    byte result = cpu->registers.a & value;
+    set_z(cpu, result);
+    cpu->clock->cpu_cycles += 3;
+}
+
 void bit_2c(struct cpu_t* cpu) {
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     //printf("[$%04x] bit $%04x\n", cpu->registers.pc, arg);
@@ -175,6 +228,22 @@ void bit_2c(struct cpu_t* cpu) {
     byte result = cpu->registers.a & value;
     set_z(cpu, result);
     cpu->clock->cpu_cycles += 4;
+}
+
+void bmi_30(struct cpu_t* cpu) {
+    sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
+    word original_pc = cpu->registers.pc + 1;
+    //printf("[$%04x] bmi *%+d\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    if (is_flag_set(cpu->registers.p, CPU_STATUS_NEGATIVE)) {
+        word new_pc = cpu->registers.pc + arg;
+        cpu->clock->cpu_cycles += 1;
+        if ((original_pc & 0xFF00) != (new_pc & 0xFF00)) {
+            cpu->clock->cpu_cycles += 1;
+        }
+        cpu->registers.pc = new_pc;
+    }
+    cpu->clock->cpu_cycles += 2;
 }
 
 void bne_d0(struct cpu_t* cpu) {
@@ -219,6 +288,13 @@ void clc_18(struct cpu_t* cpu) {
 void cld_d8(struct cpu_t* cpu) {
     //printf("[$%04x] cld\n", cpu->registers.pc);
     byte value = clear_flag(cpu->registers.p, CPU_STATUS_DECIMAL);
+    cpu->registers.p = value;
+    cpu->clock->cpu_cycles += 2;
+}
+
+void clv_b8(struct cpu_t* cpu) {
+    //printf("[$%04x] clv\n", cpu->registers.pc);
+    byte value = clear_flag(cpu->registers.p, CPU_STATUS_OVERFLOW);
     cpu->registers.p = value;
     cpu->clock->cpu_cycles += 2;
 }
@@ -488,6 +564,12 @@ void pla_68(struct cpu_t* cpu) {
     cpu->registers.a = stack_pull_byte(cpu);
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
+    cpu->clock->cpu_cycles += 4;
+}
+
+void plp_68(struct cpu_t* cpu) {
+    // printf("[$%04x] plp\n", cpu->registers.pc);
+    cpu->registers.p = (stack_pull_byte(cpu) & 0xEF) | 0x20;
     cpu->clock->cpu_cycles += 4;
 }
 
