@@ -8,6 +8,7 @@ void cpu_handle_instruction(struct cpu_t*);
 void adc_69(struct cpu_t*); // immediate, size 2, cycles 2
 void and_29(struct cpu_t*); // immediate, size 2, cycles 2
 void bcc_90(struct cpu_t*); // relative, size 2, cycles 2
+void bcs_b0(struct cpu_t*); // relative, size 2, cycles 2
 void beq_f0(struct cpu_t*); // relative, size 2, cycles 2
 void bit_2c(struct cpu_t*); // absolute, size 3, cycles 4
 void bne_d0(struct cpu_t*); // relative, size 2, cycles 2

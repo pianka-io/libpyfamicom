@@ -42,6 +42,7 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0xA9: lda_a9(cpu); break;
         case 0xAA: tax_aa(cpu); break;
         case 0xAD: lda_ad(cpu); break;
+        case 0xB0: bcs_b0(cpu); break;
         case 0xB1: lda_b1(cpu); break;
         case 0xBD: lda_bd(cpu); break;
         case 0xC5: cmp_c5(cpu); break;
@@ -112,6 +113,22 @@ void bcc_90(struct cpu_t* cpu) {
     //printf("[$%04x] bcc *%+d\n", cpu->registers.pc, arg);
     cpu->registers.pc += 1;
     if (!is_flag_set(cpu->registers.p, CPU_STATUS_CARRY)) {
+        word new_pc = cpu->registers.pc + arg;
+        cpu->clock->cpu_cycles += 1;
+        if ((original_pc & 0xFF00) != (new_pc & 0xFF00)) {
+            cpu->clock->cpu_cycles += 1;
+        }
+        cpu->registers.pc = new_pc;
+    }
+    cpu->clock->cpu_cycles += 2;
+}
+
+void bcs_b0(struct cpu_t* cpu) {
+    sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
+    word original_pc = cpu->registers.pc + 1;
+    //printf("[$%04x] bcs *%+d\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    if (is_flag_set(cpu->registers.p, CPU_STATUS_CARRY)) {
         word new_pc = cpu->registers.pc + arg;
         cpu->clock->cpu_cycles += 1;
         if ((original_pc & 0xFF00) != (new_pc & 0xFF00)) {
