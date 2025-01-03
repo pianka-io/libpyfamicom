@@ -5,6 +5,7 @@
 
 void cpu_handle_instruction(struct cpu_t*);
 
+void adc_65(struct cpu_t*); // zero, size 2, cycles 3
 void adc_69(struct cpu_t*); // immediate, size 2, cycles 2
 void and_29(struct cpu_t*); // immediate, size 2, cycles 2
 void asl_06(struct cpu_t*); // zero, size 2, cycles 5
@@ -23,11 +24,14 @@ void clv_b8(struct cpu_t*); // implicit, size 1, cycles 2
 void cmp_c5(struct cpu_t*); // zero, size 2, cycles 3
 void cmp_c9(struct cpu_t*); // immediate, size 2, cycles 2
 void cmp_cd(struct cpu_t*); // absolute, size 3, cycles 4
+void cpx_e0(struct cpu_t*); // immediate, size 2, cycles 2
+void cpy_c0(struct cpu_t*); // immediate, size 2, cycles 2
 void dec_c6(struct cpu_t*); // zero, size 2, cycles 5
 void dex_ca(struct cpu_t*); // implicit, size 1, cycles 2
 void dey_88(struct cpu_t*); // implicit, size 1, cycles 2
 void eor_45(struct cpu_t*); // zero, size 2, cycles 3
 void eor_49(struct cpu_t*); // immediate, size 2, cycles 2
+void eor_5d(struct cpu_t*); // absolute x, size 3, cycles 4*
 void inc_e6(struct cpu_t*); // zero, size 2, cycles 5
 void inc_ee(struct cpu_t*); // absolute, size 3, cycles 6
 void inx_e8(struct cpu_t*); // implicit, size 1, cycles 2
@@ -39,13 +43,17 @@ void lda_b1(struct cpu_t*); // indirect indexed, size 2, cycles 5
 void lda_bd(struct cpu_t*); // absolute x, size 3, cycles 4
 void ldx_a2(struct cpu_t*); // immediate, size 2, cycles 2
 void ldx_a6(struct cpu_t*); // zero, size 2, cycles 3
+void ldx_ae(struct cpu_t*); // absolute, size 3, cycles 4
 void ldy_a0(struct cpu_t*); // immediate, size 2, cycles 2
+void ldy_ac(struct cpu_t*); // absolute, size 3, cycles 4
 void lsr_46(struct cpu_t*); // zero, size 2, cycles 5
 void lsr_4a(struct cpu_t*); // accumulator, size 1, cycles 2
 void jmp_4c(struct cpu_t*); // absolute, size 3, cycles 3
+void jmp_6c(struct cpu_t*); // indirect, size 3, cycles 5
 void jsr_20(struct cpu_t*); // absolute, size 3, cycles 6
 void nop_ea(struct cpu_t*); // implicit, size 1, cycles 2
 void ora_09(struct cpu_t*); // immediate, size 2, cycles 2
+void ora_0d(struct cpu_t*); // absolute, size 3, cycles 4
 void pha_48(struct cpu_t*); // implicit, size 1, cycles 3
 void php_08(struct cpu_t*); // implicit, size 1, cycles 3
 void pla_68(struct cpu_t*); // implicit, size 1, cycles 4
@@ -66,6 +74,7 @@ void sta_9d(struct cpu_t*); // absolute x, size 3, cycles 5
 void stx_86(struct cpu_t*); // zero, size 2, cycles 3
 void stx_8e(struct cpu_t*); // absolute, size 3, cycles 4
 void sty_84(struct cpu_t*); // zero, size 2, cycles 3
+void sty_8c(struct cpu_t*); // absolute, size 3, cycles 4
 void tax_aa(struct cpu_t*); // implicit, size 1, cycles 2
 void tay_a8(struct cpu_t*); // implicit, size 1, cycles 2
 void tsx_ba(struct cpu_t*); // implicit, size 1, cycles 2
