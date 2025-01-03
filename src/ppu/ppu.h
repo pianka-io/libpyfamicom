@@ -22,7 +22,6 @@ typedef struct ppu_registers_t {
     word ppuscroll;
     word ppuaddr;
     byte ppudata;
-    byte oamdma;
 } ppu_registers_t;
 
 typedef struct ppu_state_t {

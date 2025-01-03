@@ -51,8 +51,6 @@ byte cpu_memory_read_byte(struct cpu_t* cpu, word address) {
                    (cpu->ppu->registers.ppuaddr >> 8);
         case PPU_REGISTER_PPUDATA:
             return cpu->ppu->registers.ppudata;
-        case PPU_REGISTER_OAMDMA:
-            return cpu->ppu->registers.oamdma;
         default:
             return cpu->memory->data[address];
     }
@@ -123,9 +121,6 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
                 cpu->ppu->registers.ppudata
             );
             cpu->ppu->registers.ppuaddr = (cpu->ppu->registers.ppuaddr + cpu->ppu->state.vram_increment) & 0x3FFF;
-            break;
-        case PPU_REGISTER_OAMDMA:
-            cpu->ppu->registers.oamdma = value;
             break;
         default:
             cpu->memory->data[address] = value;

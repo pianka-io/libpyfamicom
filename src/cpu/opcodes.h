@@ -61,12 +61,14 @@ void sei_78(struct cpu_t*); // implicit, size 1, cycles 2
 void sta_85(struct cpu_t*); // zero, size 2, cycles 3
 void sta_8d(struct cpu_t*); // absolute, size 3, cycles 4
 void sta_91(struct cpu_t*); // indirect indexed, size 2, cycles 6
+void sta_95(struct cpu_t*); // zero x, size 2, cycles 4
 void sta_9d(struct cpu_t*); // absolute x, size 3, cycles 5
 void stx_86(struct cpu_t*); // zero, size 2, cycles 3
 void stx_8e(struct cpu_t*); // absolute, size 3, cycles 4
 void sty_84(struct cpu_t*); // zero, size 2, cycles 3
 void tax_aa(struct cpu_t*); // implicit, size 1, cycles 2
 void tay_a8(struct cpu_t*); // implicit, size 1, cycles 2
+void tsx_ba(struct cpu_t*); // implicit, size 1, cycles 2
 void txa_8a(struct cpu_t*); // implicit, size 1, cycles 2
 void txs_9a(struct cpu_t*); // implicit, size 1, cycles 2
 void tya_98(struct cpu_t*); // implicit, size 1, cycles 2
