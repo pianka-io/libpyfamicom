@@ -1,5 +1,6 @@
 import numpy
-from instructions import INSTRUCTION_SET, AddressModes
+
+from dbg.instructions import INSTRUCTION_SET, AddressModes
 
 
 class Disassembler:
@@ -42,7 +43,7 @@ class Disassembler:
             )
 
             addressing_mode = Disassembler.format_addressing_mode(metadata["mode"], argument)
-            instructions.append(f"${(addr + 0x800):04x}    {metadata['mnemonic']} {addressing_mode}".strip())
+            instructions.append(f"${(addr + 0x8000 + 0x4000):04x}    {metadata['mnemonic']} {addressing_mode}".strip())
 
         return instructions
 

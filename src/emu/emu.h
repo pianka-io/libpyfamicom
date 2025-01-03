@@ -14,8 +14,10 @@ typedef struct emu_t {
 } emu_t;
 
 struct emu_t* emu_create(struct pal_t* pal, struct rom_t* rom);
+void* emu_initialize_numpy();
 void emu_destroy(struct emu_t*);
-
 void emu_tick(struct emu_t*);
+
+void dbg_cpu_tick(struct emu_t*);
 
 #endif

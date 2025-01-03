@@ -21,6 +21,11 @@ struct emu_t* emu_create(struct pal_t* pal, struct rom_t* rom) {
     return emu;
 }
 
+void* emu_initialize_numpy() {
+    import_array()
+    return NULL;
+}
+
 void emu_destroy(struct emu_t* emu) {
     ppu_destroy(emu->ppu);
     cpu_destroy(emu->cpu);
@@ -37,4 +42,16 @@ void emu_tick(struct emu_t* emu) {
         }
     }
     emu->nmi->done = false;
+}
+
+void dbg_cpu_tick(struct emu_t* emu) {
+    bool executed = false;
+    while (!executed) {
+        if (clock_ppu_ready(emu->clock)) {
+            ppu_tick(emu->ppu);
+        } else {
+            cpu_tick(emu->cpu);
+            executed = true;
+        }
+    }
 }

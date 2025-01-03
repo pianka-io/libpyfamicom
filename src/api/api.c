@@ -51,6 +51,26 @@ static PyObject* tick_emu(PyObject* self, PyObject* args) {
     Py_RETURN_NONE;
 }
 
+static PyObject* dbg_tick_cpu(PyObject* self, PyObject* args) {
+    (void)self;
+    PyObject* capsule;
+
+    if (!PyArg_ParseTuple(args, "O", &capsule)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a capsule argument");
+        return NULL;
+    }
+
+    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
+    if (!emu) {
+        PyErr_SetString(PyExc_RuntimeError, "Invalid or missing emulator capsule");
+        return NULL;
+    }
+
+    dbg_cpu_tick(emu);
+
+    Py_RETURN_NONE;
+}
+
 static PyObject* frame_emu(PyObject* self, PyObject* args) {
     (void)self;
     PyObject* capsule;
@@ -109,10 +129,11 @@ static PyObject* debug_prg_rom(PyObject* self, PyObject* args) {
 }
 
 static PyMethodDef PytendoMethods[] = {
-    {"create_emu", create_emu, METH_VARARGS, "Create a pytendo emulator."},
-    {"tick_emu", tick_emu, METH_VARARGS, "Tick a pytendo emulator."},
-    {"frame_emu", frame_emu, METH_VARARGS, "Get the latest frame from a pytendo emulator."},
-    {"debug_prg_rom", debug_prg_rom, METH_VARARGS, "Get the PRG ROM section of the emulator's memory as a numpy array."},
+    {"emu_create", create_emu, METH_VARARGS, "Create a pytendo emulator."},
+    {"emu_tick", tick_emu, METH_VARARGS, "Tick a pytendo emulator by a frame."},
+    {"emu_frame", frame_emu, METH_VARARGS, "Get the latest frame from a pytendo emulator."},
+    {"dbg_prg_rom", debug_prg_rom, METH_VARARGS, "Get the PRG ROM section of the emulator's memory as a numpy array."},
+    {"dbg_cpu_tick", dbg_tick_cpu, METH_VARARGS, "Tick a pytendo emulator by a CPU instruction."},
     {NULL, NULL, 0, NULL}
 };
 
@@ -130,6 +151,7 @@ static struct PyModuleDef pytendo_module = {
 
 PyMODINIT_FUNC PyInit_pytendo(void) {
     import_array()
+    emu_initialize_numpy();
     ppu_initialize_numpy();
     return PyModule_Create(&pytendo_module);
 }
