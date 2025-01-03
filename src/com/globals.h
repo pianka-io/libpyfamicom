@@ -60,7 +60,7 @@ static const word PPU_REGISTER_OAMDATA = 0x2004;
 static const word PPU_REGISTER_PPUSCROLL = 0x2005;
 static const word PPU_REGISTER_PPUADDR = 0x2006;
 static const word PPU_REGISTER_PPUDATA = 0x2007;
-static const word PPU_REGISTER_OAMDMA = 0x2008;
+static const word PPU_REGISTER_OAMDMA = 0x4014;
 
 static const byte PPUCTRL_BASE_NAME_TABLE = 0b00000011;
 static const byte PPUCTRL_VRAM_INCREMENT = 0b00000100;

@@ -35,6 +35,7 @@ typedef struct ppu_state_t {
     word line;
     word pixel;
 
+    uint64_t frame_number;
     PyObject* frame_array;
     byte* frame_data;
 } ppu_state_t;

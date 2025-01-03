@@ -5,7 +5,7 @@ import pytendo
 # passed: emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/1.Branch_Basics.nes")
 # passed: emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/2.Backward_branch.nes")
 # passed: emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/3.Forward_branch.nes")
-emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/cpu_dummy_reads.nes")
+emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/1.Branch_Basics.nes")
 
 
 def print_frame(frame):
@@ -20,6 +20,7 @@ def print_frame(frame):
 
 
 pygame.init()
+pygame.display.set_caption("pytendo")
 SCALE = 3
 WIDTH, HEIGHT = 256, 240
 screen = pygame.display.set_mode((WIDTH * SCALE, HEIGHT * SCALE))

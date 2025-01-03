@@ -16,6 +16,7 @@ struct cpu_t* cpu_create(struct nes_clock_t* clock, struct rom_t* rom, struct pp
     cpu->nmi = nmi;
 
     cpu->registers.pc = cpu_memory_read_word(cpu, RESET_VECTOR);
+    cpu->clock->cpu_cycles = 7;
 
     return cpu;
 }
@@ -32,6 +33,7 @@ void cpu_tick(struct cpu_t* cpu) {
         stack_push_byte(cpu, cpu->registers.p);
         word address = cpu_memory_read_word(cpu, NMI_VECTOR);
         cpu->registers.pc = address;
+        cpu->clock->cpu_cycles += 7;
     } else {
         cpu_handle_instruction(cpu);
     }

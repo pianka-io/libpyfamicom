@@ -37,16 +37,4 @@ void emu_tick(struct emu_t* emu) {
         }
     }
     emu->nmi->done = false;
-
-//    printf("start\n");
-//    for (int y = 0; y < 30; y++) {
-//        for (int x = 0; x < 32; x++) {
-//            byte tile =  ppu_pattern(emu->ppu, x, y);
-////            word address = 0x2000 + y * 32 + x;
-////            byte tile = ppu_memory_read_byte(emu->ppu, address);
-//            printf("%02x", tile);
-//        }
-//        printf("\n");
-//    }
-//    printf("end\n");
 }

@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include <printf.h>
 
 #include "com/globals.h"
 #include "cpu/memory.h"
@@ -26,8 +25,8 @@ void cpu_memory_destroy(struct cpu_memory_t* memory) {
 }
 
 byte cpu_memory_read_byte(struct cpu_t* cpu, word address) {
-    word value;
-    byte result;
+    address = translate_cpu_address(cpu, address);
+    byte status;
 
     switch (address) {
         case PPU_REGISTER_PPUCTRL:
@@ -35,27 +34,26 @@ byte cpu_memory_read_byte(struct cpu_t* cpu, word address) {
         case PPU_REGISTER_PPUMASK:
             return cpu->ppu->registers.ppumask;
         case PPU_REGISTER_PPUSTATUS:
-            return cpu->ppu->registers.ppustatus;
+            status = cpu->ppu->registers.ppustatus;
+            cpu->ppu->registers.ppustatus = clear_flag(cpu->ppu->registers.ppustatus, PPUSTATUS_VBLANK);
+            return status;
         case PPU_REGISTER_OAMADDR:
             return cpu->ppu->registers.oamaddr;
         case PPU_REGISTER_OAMDATA:
             return cpu->ppu->registers.oamdata;
         case PPU_REGISTER_PPUSCROLL:
-            value = cpu->ppu->registers.ppuscroll;
-            result = (value >> (value * 8)) & 0xFF;
-            cpu->memory->ppuscroll_read ^= 1;
-            return result;
+            return (cpu->memory->ppuscroll_read ^= 1) ?
+                   (cpu->ppu->registers.ppuscroll & 0xFF) :
+                   (cpu->ppu->registers.ppuscroll >> 8);
         case PPU_REGISTER_PPUADDR:
-            value = cpu->ppu->registers.ppuaddr;
-            result = (value >> (value * 8)) & 0xFF;
-            cpu->memory->ppuaddr_read ^= 1;
-            return result;
+            return (cpu->memory->ppuaddr_read ^= 1) ?
+                   (cpu->ppu->registers.ppuaddr & 0xFF) :
+                   (cpu->ppu->registers.ppuaddr >> 8);
         case PPU_REGISTER_PPUDATA:
             return cpu->ppu->registers.ppudata;
         case PPU_REGISTER_OAMDMA:
             return cpu->ppu->registers.oamdma;
         default:
-            address = translate_cpu_address(cpu, address);
             return cpu->memory->data[address];
     }
 }
@@ -68,9 +66,13 @@ word cpu_memory_read_word(struct cpu_t* cpu, word address) {
 }
 
 void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
-//    printf("[write] $%04x:$%02x\n", address, value);
+    address = translate_cpu_address(cpu, address);
+
     switch (address) {
         case PPU_REGISTER_PPUCTRL:
+            if (cpu->clock->ppu_cycles < 29658) {
+                return;
+            }
             cpu->ppu->registers.ppuctrl = value;
             // name table
             byte name_table = cpu->ppu->registers.ppuctrl & PPUCTRL_BASE_NAME_TABLE;
@@ -120,7 +122,6 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
                 cpu->ppu->registers.ppuaddr,
                 cpu->ppu->registers.ppudata
             );
-            printf("[$%04x] $%02x\n", cpu->ppu->registers.ppuaddr, cpu->ppu->registers.ppudata);
             cpu->ppu->registers.ppuaddr = (cpu->ppu->registers.ppuaddr + cpu->ppu->state.vram_increment) & 0x3FFF;
             break;
         case PPU_REGISTER_OAMDMA:
@@ -133,6 +134,9 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
 }
 
 word translate_cpu_address(struct cpu_t* cpu, word address) {
+    if (address >= 0x2000 && address <= 0x3FFF) {
+        return 0x2000 + (address & 0x0007);
+    }
     if (cpu->memory->mirrored && address >= PRG_ROM_OFFSET + PRG_RAM_BANK_SIZE) {
         return address - PRG_RAM_BANK_SIZE;
     }

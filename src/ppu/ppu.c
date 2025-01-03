@@ -54,15 +54,24 @@ void ppu_tick(struct ppu_t* ppu) {
     uint16_t pixel = ppu->state.pixel;
 
     if (line == PPU_PHASE_PRERENDER) {
-        ppu_prerender(ppu, line, pixel);
+        if (pixel == 0 && ppu->state.frame_number % 2 == 0) {
+            ppu_increment(ppu, line, pixel);
+            return;
+        }
+        if (pixel == 1) {
+            ppu->registers.ppustatus &= ~PPUSTATUS_VBLANK;
+        }
     } else if (line <= PPU_PHASE_LINESCAN) {
         ppu_render(ppu, line, pixel);
     } else if (line == PPU_PHASE_VBLANK && pixel == 1) {
         ppu->registers.ppustatus |= PPUSTATUS_VBLANK;
         ppu->nmi->active = true;
+    } else if (line == PPU_PHASE_PRERENDER - 1 && pixel == PIXELS_PER_LINE - 1) {
         ppu->nmi->done = true;
+        ppu->state.frame_number += 1;
     }
 
+    ppu->clock->ppu_cycles += 1;
     ppu_increment(ppu, line, pixel);
 }
 
@@ -78,14 +87,12 @@ void ppu_increment(struct ppu_t* ppu, word line, word pixel) {
 
     ppu->state.line = line;
     ppu->state.pixel = pixel;
-    ppu->clock->ppu_cycles += 1;
 }
 
 void ppu_prerender(struct ppu_t* ppu, word line, word pixel) {
+    (void)ppu;
     (void)line;
-    if (pixel == 1) {
-        ppu->registers.ppustatus &= ~PPUSTATUS_VBLANK;
-    }
+    (void)pixel;
 }
 
 void ppu_render(struct ppu_t* ppu, word line, byte pixel) {
