@@ -8,7 +8,7 @@ class Disassembler:
         pass
 
     @staticmethod
-    def disassemble(code: numpy.ndarray) -> list[str]:
+    def disassemble(code: numpy.ndarray) -> dict[int, str]:
         opcodes = {}
         for mnemonic, instruction_set in INSTRUCTION_SET.items():
             for mode, instruction in instruction_set.modes.items():
@@ -24,7 +24,7 @@ class Disassembler:
                 else:
                     opcodes[instruction.bytecode] = entry
 
-        instructions = []
+        instructions = {}
         addr = 0
         while addr < len(code):
             opcode = code[addr]
@@ -43,7 +43,8 @@ class Disassembler:
             )
 
             addressing_mode = Disassembler.format_addressing_mode(metadata["mode"], argument)
-            instructions.append(f"${(addr + 0x8000 + 0x4000):04x}    {metadata['mnemonic']} {addressing_mode}".strip())
+            address = addr + 0x8000 + 0x4000
+            instructions[address] = f"${address:04x}    {metadata['mnemonic']} {addressing_mode}".strip()
 
         return instructions
 

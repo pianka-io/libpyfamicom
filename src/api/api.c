@@ -51,26 +51,6 @@ static PyObject* tick_emu(PyObject* self, PyObject* args) {
     Py_RETURN_NONE;
 }
 
-static PyObject* dbg_tick_cpu(PyObject* self, PyObject* args) {
-    (void)self;
-    PyObject* capsule;
-
-    if (!PyArg_ParseTuple(args, "O", &capsule)) {
-        PyErr_SetString(PyExc_TypeError, "Expected a capsule argument");
-        return NULL;
-    }
-
-    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
-    if (!emu) {
-        PyErr_SetString(PyExc_RuntimeError, "Invalid or missing emulator capsule");
-        return NULL;
-    }
-
-    dbg_cpu_tick(emu);
-
-    Py_RETURN_NONE;
-}
-
 static PyObject* frame_emu(PyObject* self, PyObject* args) {
     (void)self;
     PyObject* capsule;
@@ -90,7 +70,7 @@ static PyObject* frame_emu(PyObject* self, PyObject* args) {
     return emu->ppu->state.frame_array;
 }
 
-static PyObject* debug_prg_rom(PyObject* self, PyObject* args) {
+static PyObject* dbg_prg_rom(PyObject* self, PyObject* args) {
     (void)self;
     PyObject* capsule;
 
@@ -128,11 +108,73 @@ static PyObject* debug_prg_rom(PyObject* self, PyObject* args) {
     return array;
 }
 
+static PyObject* dbg_tick_cpu(PyObject* self, PyObject* args) {
+    (void)self;
+    PyObject* capsule;
+
+    if (!PyArg_ParseTuple(args, "O", &capsule)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a capsule argument");
+        return NULL;
+    }
+
+    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
+    if (!emu) {
+        PyErr_SetString(PyExc_RuntimeError, "Invalid or missing emulator capsule");
+        return NULL;
+    }
+
+    dbg_cpu_tick(emu);
+
+    Py_RETURN_NONE;
+}
+
+static PyObject* dbg_state(PyObject* self, PyObject* args) {
+    (void)self;
+    PyObject* capsule;
+
+    if (!PyArg_ParseTuple(args, "O", &capsule)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a capsule argument");
+        return NULL;
+    }
+
+    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
+    if (!emu) {
+        PyErr_SetString(PyExc_RuntimeError, "Invalid or missing emulator capsule");
+        return NULL;
+    }
+
+    PyObject* result = PyDict_New();
+    if (!result) {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to create dictionary");
+        return NULL;
+    }
+
+    // not exactly pretty
+    PyDict_SetItemString(result, "cpu_register_a", PyLong_FromUnsignedLong((unsigned long)emu->cpu->registers.a));
+    PyDict_SetItemString(result, "cpu_register_x", PyLong_FromUnsignedLong((unsigned long)emu->cpu->registers.x));
+    PyDict_SetItemString(result, "cpu_register_y", PyLong_FromUnsignedLong((unsigned long)emu->cpu->registers.y));
+    PyDict_SetItemString(result, "cpu_register_p", PyLong_FromUnsignedLong((unsigned long)emu->cpu->registers.p));
+    PyDict_SetItemString(result, "cpu_register_sp", PyLong_FromUnsignedLong((unsigned long)emu->cpu->registers.sp));
+    PyDict_SetItemString(result, "cpu_register_pc", PyLong_FromUnsignedLong((unsigned long)emu->cpu->registers.pc));
+    PyDict_SetItemString(result, "ppu_register_ppuctrl", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.ppuctrl));
+    PyDict_SetItemString(result, "ppu_register_ppumask", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.ppumask));
+    PyDict_SetItemString(result, "ppu_register_ppustatus", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.ppustatus));
+    PyDict_SetItemString(result, "ppu_register_oamaddr", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.oamaddr));
+    PyDict_SetItemString(result, "ppu_register_oamdata", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.oamdata));
+    PyDict_SetItemString(result, "ppu_register_ppuscroll", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.ppuscroll));
+    PyDict_SetItemString(result, "ppu_register_ppuaddr", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.ppuaddr));
+    PyDict_SetItemString(result, "ppu_register_ppudata", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.ppudata));
+//    PyDict_SetItemString(result, "key2", PyUnicode_FromString("value2"));
+
+    return result;
+}
+
 static PyMethodDef PytendoMethods[] = {
     {"emu_create", create_emu, METH_VARARGS, "Create a pytendo emulator."},
     {"emu_tick", tick_emu, METH_VARARGS, "Tick a pytendo emulator by a frame."},
     {"emu_frame", frame_emu, METH_VARARGS, "Get the latest frame from a pytendo emulator."},
-    {"dbg_prg_rom", debug_prg_rom, METH_VARARGS, "Get the PRG ROM section of the emulator's memory as a numpy array."},
+    {"dbg_state", dbg_state, METH_VARARGS, "Get the CPU and PPU state."},
+    {"dbg_prg_rom", dbg_prg_rom, METH_VARARGS, "Get the PRG ROM section of the emulator's memory as a numpy array."},
     {"dbg_cpu_tick", dbg_tick_cpu, METH_VARARGS, "Tick a pytendo emulator by a CPU instruction."},
     {NULL, NULL, 0, NULL}
 };
