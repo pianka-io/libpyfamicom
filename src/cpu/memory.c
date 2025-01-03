@@ -12,6 +12,7 @@ struct cpu_memory_t* cpu_memory_create(struct rom_t* rom) {
     memcpy(memory->data + PRG_ROM_OFFSET, rom->prg_rom, rom->prg_rom_size);
 
     memory->mirrored = rom->header.prg_rom == 1;
+    memory->prg_rom_size = rom->prg_rom_size;
     memory->ppuscroll_read = 1;
     memory->ppuscroll_write = 1;
     memory->ppuaddr_read = 1;

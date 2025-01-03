@@ -7,7 +7,7 @@ import pytendo
 # passed: emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/3.Forward_branch.nes")
 
 # emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/1.Branch_Basics.nes")
-emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/tests/cpu_dummy_writes_ppumem.nes")
+emu = pytendo.create_emu("bin/pals/2C02G.pal", "bin/games/Super Mario Bros (E).nes")
 
 def print_frame(frame):
     print("start")
@@ -19,6 +19,8 @@ def print_frame(frame):
         print()
     print("end")
 
+# for _ in range(15):
+#     pytendo.tick_emu(emu)
 
 pygame.init()
 pygame.display.set_caption("pytendo")

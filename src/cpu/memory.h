@@ -7,6 +7,7 @@
 
 typedef struct cpu_memory_t {
     byte data[CPU_MEMORY_SIZE];
+    size_t prg_rom_size;
     bool mirrored;
     bool ppuscroll_read;
     bool ppuscroll_write;
