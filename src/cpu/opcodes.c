@@ -12,6 +12,7 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
     cpu->registers.pc += 1;
 
     switch (opcode) {
+        case 0x05: ora_05(cpu); break;
         case 0x06: asl_06(cpu); break;
         case 0x08: php_08(cpu); break;
         case 0x09: ora_09(cpu); break;
@@ -27,6 +28,7 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0x2C: bit_2c(cpu); break;
         case 0x30: bmi_30(cpu); break;
         case 0x38: sec_38(cpu); break;
+        case 0x3D: and_3d(cpu); break;
         case 0x40: rti_40(cpu); break;
         case 0x45: eor_45(cpu); break;
         case 0x46: lsr_46(cpu); break;
@@ -55,6 +57,7 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0x91: sta_91(cpu); break;
         case 0x95: sta_95(cpu); break;
         case 0x98: tya_98(cpu); break;
+        case 0x99: sta_99(cpu); break;
         case 0x9A: txs_9a(cpu); break;
         case 0x9D: sta_9d(cpu); break;
         case 0xA0: ldy_a0(cpu); break;
@@ -72,6 +75,7 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0xB8: clv_b8(cpu); break;
         case 0xBA: tsx_ba(cpu); break;
         case 0xBD: lda_bd(cpu); break;
+        case 0xBE: ldx_be(cpu); break;
         case 0xC0: cpy_c0(cpu); break;
         case 0xC5: cmp_c5(cpu); break;
         case 0xC9: cmp_c9(cpu); break;
@@ -88,6 +92,7 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0xEA: nop_ea(cpu); break;
         case 0xEE: inc_ee(cpu); break;
         case 0xF0: beq_f0(cpu); break;
+        case 0xF9: sbc_f9(cpu); break;
         default:
             printf("[$%04x] unknown opcode $%02x\n", pc, opcode);
             exit(0);
@@ -155,6 +160,21 @@ void and_29(struct cpu_t* cpu) {
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
     cpu->clock->cpu_cycles += 2;
+}
+
+void and_3d(struct cpu_t* cpu) {
+    word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
+    //printf("[$%04x] and $%04x,X\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 2;
+    word address = cpu->registers.x + arg;
+    byte value = cpu_memory_read_byte(cpu, address);
+    cpu->registers.a = cpu->registers.a & value;
+    set_n(cpu, cpu->registers.a);
+    set_z(cpu, cpu->registers.a);
+    if ((arg & 0xFF00) != (address & 0xFF00)) {
+        cpu->clock->cpu_cycles += 1;
+    }
+    cpu->clock->cpu_cycles += 4;
 }
 
 void asl_06(struct cpu_t* cpu) {
@@ -288,14 +308,12 @@ void bne_d0(struct cpu_t* cpu) {
     cpu->registers.pc += 1;
     if (!is_flag_set(cpu->registers.p, CPU_STATUS_ZERO)) {
         word new_pc = cpu->registers.pc + arg;
-//        //printf("pc $%04x arg %d new_pc $%04x\n", cpu->registers.pc, arg, new_pc);
         cpu->clock->cpu_cycles += 1;
         if ((original_pc & 0xFF00) != (new_pc & 0xFF00)) {
             cpu->clock->cpu_cycles += 1;
         }
         cpu->registers.pc = new_pc;
     }
-//    //printf("pc $%04x arg %d\n", cpu->registers.pc, arg);
     cpu->clock->cpu_cycles += 2;
 }
 
@@ -634,6 +652,21 @@ void ldx_ae(struct cpu_t* cpu) {
     cpu->clock->cpu_cycles += 4;
 }
 
+void ldx_be(struct cpu_t* cpu) {
+    word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
+    //printf("[$%04x] ldx $%04x\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 2;
+    word address = cpu->registers.y + arg;
+    byte value = cpu_memory_read_byte(cpu, address);
+    cpu->registers.x = value;
+    set_n(cpu, value);
+    set_z(cpu, value);
+    if ((arg & 0xFF00) != (address & 0xFF00)) {
+        cpu->clock->cpu_cycles += 1;
+    }
+    cpu->clock->cpu_cycles += 4;
+}
+
 void ldy_a0(struct cpu_t* cpu) {
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     //printf("[$%04x] ldy #$%02x\n", cpu->registers.pc, arg);
@@ -689,6 +722,17 @@ void lsr_4a(struct cpu_t* cpu) {
 void nop_ea(struct cpu_t* cpu) {
     //printf("[$%04x] nop\n", cpu->registers.pc);
     cpu->clock->cpu_cycles += 2;
+}
+
+void ora_05(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
+    //printf("[$%04x] ora $%02x\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    byte value = cpu_memory_read_byte(cpu, arg);
+    cpu->registers.a = cpu->registers.a | value;
+    set_n(cpu, cpu->registers.a);
+    set_z(cpu, cpu->registers.a);
+    cpu->clock->cpu_cycles += 3;
 }
 
 void ora_09(struct cpu_t* cpu) {
@@ -821,6 +865,32 @@ void sbc_e9(struct cpu_t* cpu) {
     cpu->clock->cpu_cycles += 2;
 }
 
+void sbc_f9(struct cpu_t* cpu) {
+    word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
+    //printf("[$%04x] sbc $%04x,X\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 2;
+    word address = cpu->registers.x + arg;
+    byte value = cpu_memory_read_byte(cpu, address);
+    uint16_t result = cpu->registers.a - value - ((cpu->registers.p & 0x01) ? 0 : 1);
+    if (result < 0x100) {
+        cpu->registers.p |= CPU_STATUS_CARRY;
+    } else {
+        cpu->registers.p &= ~CPU_STATUS_CARRY;
+    }
+    if ((cpu->registers.a ^ value) & 0x80 && (cpu->registers.a ^ result) & 0x80) {
+        cpu->registers.p |= CPU_STATUS_OVERFLOW;
+    } else {
+        cpu->registers.p &= ~CPU_STATUS_OVERFLOW;
+    }
+    cpu->registers.a = (byte)result;
+    set_n(cpu, cpu->registers.a);
+    set_z(cpu, cpu->registers.a);
+    if ((arg & 0xFF00) != (address & 0xFF00)) {
+        cpu->clock->cpu_cycles += 1;
+    }
+    cpu->clock->cpu_cycles += 4;
+}
+
 void sec_38(struct cpu_t* cpu) {
     //printf("[$%04x] sec\n", cpu->registers.pc);
     cpu->registers.p = set_flag(cpu->registers.p, CPU_STATUS_CARRY);
@@ -866,6 +936,15 @@ void sta_95(struct cpu_t* cpu) {
     word address = (cpu->registers.x + arg) & 0xFF;
     cpu_memory_write_byte(cpu, address, cpu->registers.a);
     cpu->clock->cpu_cycles += 4;
+}
+
+void sta_99(struct cpu_t* cpu) {
+    word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
+    //printf("[$%04x] sta $%04x,Y\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 2;
+    word address = cpu->registers.y + arg;
+    cpu_memory_write_byte(cpu, address, cpu->registers.a);
+    cpu->clock->cpu_cycles += 5;
 }
 
 void sta_9d(struct cpu_t* cpu) {
