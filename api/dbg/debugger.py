@@ -48,7 +48,6 @@ class Debugger:
                 case State.RUNNING:
                     for _ in range(29780):
                         state = pytendo.dbg_state(self.emulator.emu)
-                        # print(f"{state["cpu_register_pc"]} {self.breakpoints}")
                         if state["cpu_register_pc"] in self.breakpoints:
                             self.state = State.BREAKPOINT
                             self.draw_state()
@@ -66,7 +65,6 @@ class Debugger:
                     self.draw_state()
                     self.broken = state["cpu_register_pc"]
                     self.state = State.BREAKPOINT
-                    ...
 
             state = pytendo.dbg_state(self.emulator.emu)
             current = self.current
@@ -77,6 +75,7 @@ class Debugger:
                 if self.current in self.line_by_address:
                     self.update_highlighted(self.line_by_address[self.current])
                     dpg.set_y_scroll("code_window", self.line_by_address[self.current] * line_height - 100)
+            self.draw_state()
 
             frame = self.emulator.frame()
             frame = np.transpose(frame, (1, 0, 2))
@@ -187,12 +186,32 @@ class Debugger:
         d = (p & 0x04) >> 2
         b = (p & 0x02) >> 1
 
-        line_0 = f"A    X    Y    SP   PC     P          N V Z C I D B"
-        line_1 = f"${a:02x}  ${x:02x}  ${y:02x}  ${sp:02x}  ${pc:04x}  ${p:08b}  {n} {v} {z} {c} {i} {d} {b}"
+        cpu_cycles = state["cycles_cpu"]
+        ppu_cycles = state["cycles_ppu"]
+
+        ppuctrl = state["ppu_register_ppuctrl"]
+        ppumask = state["ppu_register_ppumask"]
+        ppustatus = state["ppu_register_ppustatus"]
+        oamaddr = state["ppu_register_oamaddr"]
+        oamdata = state["ppu_register_oamdata"]
+        ppuscroll = state["ppu_register_ppuscroll"]
+        ppuaddr = state["ppu_register_ppuaddr"]
+        ppudata = state["ppu_register_ppudata"]
+
+        line_0 = f"A    X    Y    SP   PC     N V Z C I D B   CPU         PPU"
+        line_1 = f"${a:02x}  ${x:02x}  ${y:02x}  ${sp:02x}  ${pc:04x}  {n} {v} {z} {c} {i} {d} {b}   {cpu_cycles:<12} {ppu_cycles:<12}"
+        line_2 = "PPUCTRL     PPUMASK     PPUSTATUS   OAMADDR"
+        line_3 = f"{f'${ppuctrl:04x}':<12}{f'${ppumask:04x}':<12}{f'${ppustatus:04x}':<12}{f'${oamaddr:04x}':<12}"
+        line_4 = "OAMDATA     PPUSCROLL   PPUADDR     PPUDATA"
+        line_5 = f"{f'${oamdata:04x}':<12}{f'${ppuscroll:04x}':<12}{f'${ppuaddr:04x}':<12}{f'${ppudata:04x}':<12}"
         # print(line_0)
         # print(line_1)
         draw_state_line(0, line_0)
         draw_state_line(1, line_1)
+        draw_state_line(2, line_2)
+        draw_state_line(3, line_3)
+        draw_state_line(4, line_4)
+        draw_state_line(5, line_5)
 
     def draw_lines(self, lines: list[str]):
         for i, line in enumerate(lines):

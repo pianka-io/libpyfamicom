@@ -26,7 +26,6 @@ link_directories(${Python3_LIBRARY_DIRS})
 
 set(SOURCES
     ${SRC_DIR}/api/api.c
-    ${SRC_DIR}/app/main.c
     ${SRC_DIR}/com/clock.c
     ${SRC_DIR}/com/interrupt.c
     ${SRC_DIR}/cpu/cpu.c
@@ -51,7 +50,7 @@ add_custom_command(
     ${CMAKE_SOURCE_DIR}/api/
 )
 
-add_executable(pytendo_exec ${SOURCES})
-set_target_properties(pytendo_exec PROPERTIES OUTPUT_NAME "pytendo")
-target_include_directories(pytendo_exec PUBLIC ${SRC_DIR})
-target_link_libraries(pytendo_exec ${Python3_LIBRARIES})
+#add_executable(pytendo_exec ${SOURCES})
+#set_target_properties(pytendo_exec PROPERTIES OUTPUT_NAME "pytendo")
+#target_include_directories(pytendo_exec PUBLIC ${SRC_DIR})
+#target_link_libraries(pytendo_exec ${Python3_LIBRARIES})

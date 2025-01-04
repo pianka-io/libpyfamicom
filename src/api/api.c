@@ -150,6 +150,8 @@ static PyObject* dbg_state(PyObject* self, PyObject* args) {
     }
 
     // not exactly pretty
+    PyDict_SetItemString(result, "cycles_cpu", PyLong_FromUnsignedLong((unsigned long)emu->clock->cpu_cycles));
+    PyDict_SetItemString(result, "cycles_ppu", PyLong_FromUnsignedLong((unsigned long)emu->clock->ppu_cycles));
     PyDict_SetItemString(result, "cpu_register_a", PyLong_FromUnsignedLong((unsigned long)emu->cpu->registers.a));
     PyDict_SetItemString(result, "cpu_register_x", PyLong_FromUnsignedLong((unsigned long)emu->cpu->registers.x));
     PyDict_SetItemString(result, "cpu_register_y", PyLong_FromUnsignedLong((unsigned long)emu->cpu->registers.y));
@@ -164,7 +166,6 @@ static PyObject* dbg_state(PyObject* self, PyObject* args) {
     PyDict_SetItemString(result, "ppu_register_ppuscroll", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.ppuscroll));
     PyDict_SetItemString(result, "ppu_register_ppuaddr", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.ppuaddr));
     PyDict_SetItemString(result, "ppu_register_ppudata", PyLong_FromUnsignedLong((unsigned long)emu->ppu->registers.ppudata));
-//    PyDict_SetItemString(result, "key2", PyUnicode_FromString("value2"));
 
     return result;
 }
