@@ -7,6 +7,7 @@
 #include "ines/rom.h"
 #include "cpu/memory.h"
 #include "emu/emu.h"
+#include "ppu/memory.h"
 
 void emu_capsule_destructor(PyObject* capsule) {
     struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
@@ -170,6 +171,82 @@ static PyObject* dbg_state(PyObject* self, PyObject* args) {
     return result;
 }
 
+static PyObject* dbg_cpu_ram(PyObject* self, PyObject* args) {
+    (void)self;
+    PyObject* capsule;
+
+    if (!PyArg_ParseTuple(args, "O", &capsule)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a capsule argument");
+        return NULL;
+    }
+
+    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
+    if (!emu) {
+        PyErr_SetString(PyExc_RuntimeError, "Invalid or missing emulator capsule");
+        return NULL;
+    }
+
+    if (!emu->cpu || !emu->cpu->memory) {
+        PyErr_SetString(PyExc_RuntimeError, "CPU or memory is not initialized");
+        return NULL;
+    }
+
+    struct cpu_memory_t* memory = emu->cpu->memory;
+    npy_intp dims[1] = {(npy_intp)CPU_MEMORY_SIZE};
+    if (dims[0] <= 0) {
+        PyErr_SetString(PyExc_RuntimeError, "PRG ROM size is invalid");
+        return NULL;
+    }
+
+    PyObject* array = PyArray_SimpleNew(1, dims, NPY_UINT8);
+    if (!array) {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to create numpy array");
+        return NULL;
+    }
+
+    memcpy(PyArray_DATA((PyArrayObject*)array), memory->data, CPU_MEMORY_SIZE);
+
+    return array;
+}
+
+static PyObject* dbg_ppu_ram(PyObject* self, PyObject* args) {
+    (void)self;
+    PyObject* capsule;
+
+    if (!PyArg_ParseTuple(args, "O", &capsule)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a capsule argument");
+        return NULL;
+    }
+
+    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
+    if (!emu) {
+        PyErr_SetString(PyExc_RuntimeError, "Invalid or missing emulator capsule");
+        return NULL;
+    }
+
+    if (!emu->cpu || !emu->ppu->memory) {
+        PyErr_SetString(PyExc_RuntimeError, "CPU or memory is not initialized");
+        return NULL;
+    }
+
+    struct ppu_memory_t* memory = emu->ppu->memory;
+    npy_intp dims[1] = {(npy_intp)PPU_MEMORY_SIZE};
+    if (dims[0] <= 0) {
+        PyErr_SetString(PyExc_RuntimeError, "PRG ROM size is invalid");
+        return NULL;
+    }
+
+    PyObject* array = PyArray_SimpleNew(1, dims, NPY_UINT8);
+    if (!array) {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to create numpy array");
+        return NULL;
+    }
+
+    memcpy(PyArray_DATA((PyArrayObject*)array), memory->data, PPU_MEMORY_SIZE);
+
+    return array;
+}
+
 static PyMethodDef PytendoMethods[] = {
     {"emu_create", create_emu, METH_VARARGS, "Create a pytendo emulator."},
     {"emu_tick", tick_emu, METH_VARARGS, "Tick a pytendo emulator by a frame."},
@@ -177,6 +254,8 @@ static PyMethodDef PytendoMethods[] = {
     {"dbg_state", dbg_state, METH_VARARGS, "Get the CPU and PPU state."},
     {"dbg_prg_rom", dbg_prg_rom, METH_VARARGS, "Get the PRG ROM section of the emulator's memory as a numpy array."},
     {"dbg_cpu_tick", dbg_tick_cpu, METH_VARARGS, "Tick a pytendo emulator by a CPU instruction."},
+    {"dbg_cpu_ram", dbg_cpu_ram, METH_VARARGS, "Get the CPU memory as a numpy array."},
+    {"dbg_ppu_ram", dbg_ppu_ram, METH_VARARGS, "Get the PPU memory as a numpy array."},
     {NULL, NULL, 0, NULL}
 };
 

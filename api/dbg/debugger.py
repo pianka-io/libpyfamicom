@@ -16,6 +16,7 @@ class State(Enum):
     RUNNING = 1
     BREAKPOINT = 2
     STEP = 3
+    NEXT_VBLANK = 4
 
 
 class Debugger:
@@ -36,6 +37,7 @@ class Debugger:
         self.current = 0
         self.broken = 0
         self.state = State.PAUSED
+        self.memory_tab_tag = "tab_cpu"
 
     def run(self):
         while dpg.is_dearpygui_running():
@@ -65,6 +67,8 @@ class Debugger:
                     self.draw_state()
                     self.broken = state["cpu_register_pc"]
                     self.state = State.BREAKPOINT
+                case State.NEXT_VBLANK:
+                    pass
 
             state = pytendo.dbg_state(self.emulator.emu)
             current = self.current
@@ -76,6 +80,7 @@ class Debugger:
                     self.update_highlighted(self.line_by_address[self.current])
                     dpg.set_y_scroll("code_window", self.line_by_address[self.current] * line_height - 100)
             self.draw_state()
+            self.draw_memory()
 
             frame = self.emulator.frame()
             frame = np.transpose(frame, (1, 0, 2))
@@ -112,6 +117,7 @@ class Debugger:
                     with dpg.group(horizontal=True):
                         dpg.add_button(label="Run", callback=self.on_click_run)
                         dpg.add_button(label="Step", callback=self.on_click_step)
+                        dpg.add_button(label="Next Vblank", callback=self.on_click_next_vblank)
                     with dpg.child_window(width=400, height=46 * scale_factor, tag="state_window"):
                         with dpg.drawlist(width=380, height=6 * 20, tag="state_drawlist"):
                             pass
@@ -121,7 +127,7 @@ class Debugger:
                         with dpg.tab(label="PPU", tag="tab_ppu"):
                             pass
                     with dpg.child_window(width=400, height=177 * scale_factor + 1, tag="memory_window"):
-                        with dpg.drawlist(width=170, height=len(lines) * 20, tag="memory_drawlist"):
+                        with dpg.drawlist(width=380, height=len(lines) * 20, tag="memory_drawlist"):
                             pass
 
     def on_click_run(self, sender, app_data):
@@ -142,8 +148,16 @@ class Debugger:
         if current in self.line_by_address:
             self.update_highlighted(self.line_by_address[current])
 
+    def on_click_next_vblank(self, sender, app_data):
+        self.state = State.NEXT_VBLANK
+        broken = self.broken
+        self.broken = 0
+        if broken in self.line_by_address:
+            self.update_highlighted(self.line_by_address[broken])
+
     def on_tab_change(self, sender, app_data):
-        # print(f"Tab changed to: {app_data}")
+        tab_tag = dpg.get_item_alias(app_data)
+        self.memory_tab_tag = tab_tag
         pass
 
     def create_viewport(self):
@@ -199,13 +213,11 @@ class Debugger:
         ppudata = state["ppu_register_ppudata"]
 
         line_0 = f"A    X    Y    SP   PC     N V Z C I D B   CPU         PPU"
-        line_1 = f"${a:02x}  ${x:02x}  ${y:02x}  ${sp:02x}  ${pc:04x}  {n} {v} {z} {c} {i} {d} {b}   {cpu_cycles:<12} {ppu_cycles:<12}"
+        line_1 = f"${a:02x}  ${x:02x}  ${y:02x}  ${sp:02x}  ${pc:04x}  {n} {v} {z} {c} {i} {d} {b}   {cpu_cycles:<12,} {ppu_cycles:<12,}"
         line_2 = "PPUCTRL     PPUMASK     PPUSTATUS   OAMADDR"
         line_3 = f"{f'${ppuctrl:04x}':<12}{f'${ppumask:04x}':<12}{f'${ppustatus:04x}':<12}{f'${oamaddr:04x}':<12}"
         line_4 = "OAMDATA     PPUSCROLL   PPUADDR     PPUDATA"
         line_5 = f"{f'${oamdata:04x}':<12}{f'${ppuscroll:04x}':<12}{f'${ppuaddr:04x}':<12}{f'${ppudata:04x}':<12}"
-        # print(line_0)
-        # print(line_1)
         draw_state_line(0, line_0)
         draw_state_line(1, line_1)
         draw_state_line(2, line_2)
@@ -222,7 +234,6 @@ class Debugger:
 
             dpg.draw_rectangle([0, y_start], [300, y_end], color=(0, 0, 0, 0), fill=(0, 0, 0, 0), tag=rect_tag,
                                parent="code_drawlist")
-            # backgrounds[rect_tag] = (0, 0, 0, 0)
             dpg.draw_text([5, y_start + 5], line, color=(255, 255, 255), tag=text_tag, parent="code_drawlist")
 
     def update_highlighted(self, line: int):
@@ -260,3 +271,29 @@ class Debugger:
                     self.breakpoints.add(address)
                 self.update_highlighted(i)
                 break
+
+    def draw_memory(self):
+        if self.memory_tab_tag == "tab_cpu":
+            memory = pytendo.dbg_cpu_ram(self.emulator.emu)
+        else:
+            memory = pytendo.dbg_ppu_ram(self.emulator.emu)
+        bytes_per_line = 16
+        memory_lines = []
+
+        header = "       " + " ".join(f"{i:02X}" for i in range(bytes_per_line))
+        memory_lines.append(header)
+
+        for i in range(0, len(memory), bytes_per_line):
+            address = f"${i:04X}"
+            line_bytes = memory[i:i + bytes_per_line]
+            hex_values = " ".join(f"{byte:02X}" for byte in line_bytes)
+            memory_line = f"{address}: {hex_values}"
+            memory_lines.append(memory_line)
+
+        memory_text = "\n".join(memory_lines)
+        content_height = ((len(memory_lines) / 2) + 1) * line_height
+        dpg.configure_item("memory_drawlist", height=content_height)
+        dpg.delete_item("memory_drawlist", children_only=True)
+        dpg.draw_text([5, 5], memory_text, color=(255, 255, 255), tag="memory_text", parent="memory_drawlist")
+
+
