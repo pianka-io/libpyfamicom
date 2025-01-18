@@ -5,7 +5,6 @@
 #include "com/clock.h"
 #include "com/globals.h"
 #include "com/interrupt.h"
-#include "com/timer.h"
 #include "ppu/ppu.h"
 
 typedef struct cpu_registers_t {

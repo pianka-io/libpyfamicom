@@ -22,6 +22,8 @@ void cpu_handle_instruction(struct cpu_t* cpu) {
         case 0x18: clc_18(cpu); break;
         case 0x20: jsr_20(cpu); break;
         case 0x24: bit_24(cpu); break;
+        case 0x25: and_25(cpu); break;
+        case 0x26: rol_26(cpu); break;
         case 0x28: plp_68(cpu); break;
         case 0x29: and_29(cpu); break;
         case 0x2A: rol_2a(cpu); break;
@@ -152,6 +154,17 @@ void adc_69(struct cpu_t* cpu) {
     cpu->clock->cpu_cycles += 2;
 }
 
+void and_25(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
+    //printf("[$%04x] and %+d\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    byte value = cpu_memory_read_byte(cpu, arg);
+    cpu->registers.a = cpu->registers.a & value;
+    set_n(cpu, cpu->registers.a);
+    set_z(cpu, cpu->registers.a);
+    cpu->clock->cpu_cycles += 3;
+}
+
 void and_29(struct cpu_t* cpu) {
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     //printf("[$%04x] and #$%02x\n", cpu->registers.pc, arg);
@@ -197,17 +210,14 @@ void asl_06(struct cpu_t* cpu) {
 void asl_0a(struct cpu_t* cpu) {
     //printf("[$%04x] asl\n", cpu->registers.pc);
     uint8_t result = cpu->registers.a << 1;
-
     if (cpu->registers.a & 0x80) {
         cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
         cpu->registers.p &= ~CPU_STATUS_CARRY;
     }
-
     cpu->registers.a = result;
     set_n(cpu, result);
     set_z(cpu, result);
-
     cpu->clock->cpu_cycles += 2;
 }
 
@@ -781,6 +791,24 @@ void plp_68(struct cpu_t* cpu) {
     //printf("[$%04x] plp\n", cpu->registers.pc);
     cpu->registers.p = (stack_pull_byte(cpu) & 0xEF) | 0x20;
     cpu->clock->cpu_cycles += 4;
+}
+
+void rol_26(struct cpu_t* cpu) {
+    byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
+    //printf("[$%04x] rol $%02x\n", cpu->registers.pc, arg);
+    cpu->registers.pc += 1;
+    byte value = cpu_memory_read_byte(cpu, arg);
+    uint8_t carry = (cpu->registers.p & CPU_STATUS_CARRY);
+    uint8_t result = (value << 1) | carry;
+    if (value & 0x80) {
+        cpu->registers.p |= CPU_STATUS_CARRY;
+    } else {
+        cpu->registers.p &= ~CPU_STATUS_CARRY;
+    }
+    cpu_memory_write_byte(cpu, arg, result);
+    set_n(cpu, result);
+    set_z(cpu, result);
+    cpu->clock->cpu_cycles += 5;
 }
 
 void rol_2a(struct cpu_t* cpu) {

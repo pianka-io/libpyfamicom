@@ -7,6 +7,7 @@ void cpu_handle_instruction(struct cpu_t*);
 
 void adc_65(struct cpu_t*); // zero, size 2, cycles 3
 void adc_69(struct cpu_t*); // immediate, size 2, cycles 2
+void and_25(struct cpu_t*); // zero, size 2, cycles 3
 void and_29(struct cpu_t*); // immediate, size 2, cycles 2
 void and_3d(struct cpu_t*); // absolute x, size 3, cycles 4*
 void asl_06(struct cpu_t*); // zero, size 2, cycles 5
@@ -61,6 +62,7 @@ void pha_48(struct cpu_t*); // implicit, size 1, cycles 3
 void php_08(struct cpu_t*); // implicit, size 1, cycles 3
 void pla_68(struct cpu_t*); // implicit, size 1, cycles 4
 void plp_68(struct cpu_t*); // implicit, size 1, cycles 4
+void rol_26(struct cpu_t*); // zero, size 2, cycles 5
 void rol_2a(struct cpu_t*); // accumulator, size 1, cycles 2
 void ror_66(struct cpu_t*); // zero, size 2, cycles 5
 void ror_6a(struct cpu_t*); // accumulator, size 1, cycles 2
