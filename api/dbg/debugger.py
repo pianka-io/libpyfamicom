@@ -16,7 +16,7 @@ class State(Enum):
     RUNNING = 1
     BREAKPOINT = 2
     STEP = 3
-    NEXT_VBLANK = 4
+    STEP_128 = 4
 
 
 class Debugger:
@@ -67,8 +67,13 @@ class Debugger:
                     self.draw_state()
                     self.broken = state["cpu_register_pc"]
                     self.state = State.BREAKPOINT
-                case State.NEXT_VBLANK:
-                    pass
+                case State.STEP_128:
+                    for _ in range(128):
+                        self.tick_cpu()
+                    state = pytendo.dbg_state(self.emulator.emu)
+                    self.draw_state()
+                    self.broken = state["cpu_register_pc"]
+                    self.state = State.BREAKPOINT
 
             state = pytendo.dbg_state(self.emulator.emu)
             current = self.current
@@ -117,7 +122,7 @@ class Debugger:
                     with dpg.group(horizontal=True):
                         dpg.add_button(label="Run", callback=self.on_click_run)
                         dpg.add_button(label="Step", callback=self.on_click_step)
-                        dpg.add_button(label="Next Vblank", callback=self.on_click_next_vblank)
+                        dpg.add_button(label="Step 128", callback=self.on_click_step_128)
                     with dpg.child_window(width=400, height=46 * scale_factor, tag="state_window"):
                         with dpg.drawlist(width=380, height=6 * 20, tag="state_drawlist"):
                             pass
@@ -148,8 +153,8 @@ class Debugger:
         if current in self.line_by_address:
             self.update_highlighted(self.line_by_address[current])
 
-    def on_click_next_vblank(self, sender, app_data):
-        self.state = State.NEXT_VBLANK
+    def on_click_step_128(self, sender, app_data):
+        self.state = State.STEP_128
         broken = self.broken
         self.broken = 0
         if broken in self.line_by_address:
