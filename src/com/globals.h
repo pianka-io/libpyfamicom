@@ -73,6 +73,22 @@ static const byte PPUCTRL_VBLANK_NMI = 0b010000000;
 
 static const byte PPUSTATUS_VBLANK = 0b10000000;
 
+enum AddressingMode {
+    IMPLICIT,
+    ACCUMULATOR,
+    IMMEDIATE,
+    ZERO_PAGE,
+    ZERO_PAGE_X,
+    ZERO_PAGE_Y,
+    RELATIVE,
+    ABSOLUTE,
+    ABSOLUTE_X,
+    ABSOLUTE_Y,
+    INDIRECT,
+    INDEXED_INDIRECT,
+    INDIRECT_INDEXED
+};
+
 static inline bool is_flag_set(byte value, byte flag) {
     return (value & flag) == flag;
 }

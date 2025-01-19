@@ -17,6 +17,7 @@ struct cpu_t* cpu_create(struct nes_clock_t* clock, struct rom_t* rom, struct pp
     cpu->controller = controller;
 
     cpu->registers.pc = cpu_memory_read_word(cpu, RESET_VECTOR);
+//    cpu->registers.pc = 0xC000;
     cpu->registers.sp = 0xFF;
     cpu->clock->cpu_cycles = 7;
 

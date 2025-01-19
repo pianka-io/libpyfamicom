@@ -59,13 +59,11 @@ void ppu_tick(struct ppu_t* ppu) {
             return;
         }
         if (pixel == 1) {
-//            printf("clearing vblank\n");
             ppu->registers.ppustatus &= ~PPUSTATUS_VBLANK;
         }
     } else if (line <= PPU_PHASE_LINESCAN) {
         ppu_render(ppu, line, pixel);
     } else if (line == PPU_PHASE_VBLANK && pixel == 1) {
-//        printf("setting vblank\n");
         ppu->registers.ppustatus |= PPUSTATUS_VBLANK;
         if (ppu->registers.ppuctrl & PPUCTRL_VBLANK_NMI) {
             ppu->nmi->active = true;
