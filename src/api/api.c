@@ -247,6 +247,46 @@ static PyObject* dbg_ppu_ram(PyObject* self, PyObject* args) {
     return array;
 }
 
+static PyObject* emu_controller_press(PyObject* self, PyObject* args) {
+    (void)self;
+    PyObject* capsule;
+    byte button;
+
+    if (!PyArg_ParseTuple(args, "Ob", &capsule, &button)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a capsule and a byte as arguments");
+        return NULL;
+    }
+
+    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
+    if (!emu) {
+        PyErr_SetString(PyExc_RuntimeError, "Invalid or missing emulator capsule");
+        return NULL;
+    }
+
+    emu->controller.state = controller_press(emu->controller.state, button);
+    Py_RETURN_NONE;
+}
+
+static PyObject* emu_controller_release(PyObject* self, PyObject* args) {
+    (void)self;
+    PyObject* capsule;
+    byte button;
+
+    if (!PyArg_ParseTuple(args, "Ob", &capsule, &button)) {
+        PyErr_SetString(PyExc_TypeError, "Expected a capsule and a byte as arguments");
+        return NULL;
+    }
+
+    struct emu_t* emu = (struct emu_t*)PyCapsule_GetPointer(capsule, "emu_t");
+    if (!emu) {
+        PyErr_SetString(PyExc_RuntimeError, "Invalid or missing emulator capsule");
+        return NULL;
+    }
+
+    emu->controller.state = controller_release(emu->controller.state, button);
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef PytendoMethods[] = {
     {"emu_create", create_emu, METH_VARARGS, "Create a pytendo emulator."},
     {"emu_tick", tick_emu, METH_VARARGS, "Tick a pytendo emulator by a frame."},
@@ -256,6 +296,8 @@ static PyMethodDef PytendoMethods[] = {
     {"dbg_cpu_tick", dbg_tick_cpu, METH_VARARGS, "Tick a pytendo emulator by a CPU instruction."},
     {"dbg_cpu_ram", dbg_cpu_ram, METH_VARARGS, "Get the CPU memory as a numpy array."},
     {"dbg_ppu_ram", dbg_ppu_ram, METH_VARARGS, "Get the PPU memory as a numpy array."},
+    {"emu_controller_press", emu_controller_press, METH_VARARGS, "Press a button on the controller."},
+    {"emu_controller_release", emu_controller_release, METH_VARARGS, "Release a button on the controller."},
     {NULL, NULL, 0, NULL}
 };
 

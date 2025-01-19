@@ -61,6 +61,9 @@ static const word PPU_REGISTER_PPUSCROLL = 0x2005;
 static const word PPU_REGISTER_PPUADDR = 0x2006;
 static const word PPU_REGISTER_PPUDATA = 0x2007;
 
+static const word INPUT_REGISTER_ONE = 0x4016;
+static const word INPUT_REGISTER_TWO = 0x4017;
+
 static const byte PPUCTRL_BASE_NAME_TABLE = 0b00000011;
 static const byte PPUCTRL_VRAM_INCREMENT = 0b00000100;
 static const byte PPUCTRL_SPRITE_PATTERN_TABLE = 0b00001000;

@@ -5,12 +5,14 @@
 #include "cpu/cpu.h"
 #include "ines/pal.h"
 #include "ines/rom.h"
+#include "controller.h"
 
 typedef struct emu_t {
     struct nes_clock_t* clock;
     struct cpu_t* cpu;
     struct ppu_t* ppu;
     struct interrupt_t* nmi;
+    struct controller_t controller;
 } emu_t;
 
 struct emu_t* emu_create(struct pal_t* pal, struct rom_t* rom);
