@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <printf.h>
 #include "com/clock.h"
 
 struct nes_clock_t* clock_create(){

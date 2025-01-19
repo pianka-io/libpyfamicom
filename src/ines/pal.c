@@ -6,7 +6,7 @@
 
 struct pal_t* pal_load(const char* filename) {
     struct pal_t* pal = (struct pal_t*)calloc(1, sizeof(struct pal_t));
-    size_t data_size;
+    size_t data_size = 0;
     uint8_t* data = load_file(filename, &data_size);
 
     memcpy(&pal->data, data, data_size);

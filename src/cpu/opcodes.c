@@ -226,7 +226,7 @@ void log_instruction(struct cpu_t *cpu, const char *mnemonic, enum AddressingMod
             printf("11 %02X %02X %02X ", opcode, operand1, operand2);
             printf("%s ($%04X) = %04X ", mnemonic, (operand2 << 8) | operand1,
                    (cpu_memory_read_byte_ghost(cpu, (operand2 << 8) | operand1, true) |
-                    (cpu_memory_read_byte_ghost(cpu, ((operand2 << 8) | operand1 + 1) & 0xFFFF, true) << 8)));
+                    (cpu_memory_read_byte_ghost(cpu, ((operand2 << 8) | (operand1 + 1)) & 0xFFFF, true) << 8)));
             break;
         case INDEXED_INDIRECT:
             printf("12 %02X %02X     ", opcode, operand1);
