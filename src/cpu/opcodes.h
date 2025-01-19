@@ -20,6 +20,8 @@ void bit_2c(struct cpu_t*); // absolute, size 3, cycles 4
 void bmi_30(struct cpu_t*); // relative, size 2, cycles 2
 void bne_d0(struct cpu_t*); // relative, size 2, cycles 2
 void bpl_10(struct cpu_t*); // relative, size 2, cycles 2
+void bvc_50(struct cpu_t*); // relative, size 2, cycles 2
+void bvs_70(struct cpu_t*); // relative, size 2, cycles 2
 void clc_18(struct cpu_t*); // implicit, size 1, cycles 2
 void cld_d8(struct cpu_t*); // implicit, size 1, cycles 2
 void clv_b8(struct cpu_t*); // implicit, size 1, cycles 2
@@ -71,6 +73,7 @@ void rts_60(struct cpu_t*); // implicit, size 1, cycles 6
 void sbc_e9(struct cpu_t*); // immediate, size 2, cycles 2
 void sbc_f9(struct cpu_t*); // absolute x, size 3, cycles 4*
 void sec_38(struct cpu_t*); // implicit, size 1, cycles 2
+void sed_f8(struct cpu_t*); // implicit, size 1, cycles 2
 void sei_78(struct cpu_t*); // implicit, size 1, cycles 2
 void sta_85(struct cpu_t*); // zero, size 2, cycles 3
 void sta_8d(struct cpu_t*); // absolute, size 3, cycles 4
