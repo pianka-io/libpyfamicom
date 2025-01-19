@@ -8,6 +8,7 @@ struct ppu_t* ppu_create(struct nes_clock_t* clock, struct rom_t* rom, struct in
     struct ppu_memory_t* memory = ppu_memory_create(rom);
 
     ppu->clock = clock;
+    ppu->clock->cpu_cycles = 22;
     ppu->memory = memory;
     ppu->nmi = nmi;
     ppu->pal = pal;
