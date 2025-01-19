@@ -173,108 +173,108 @@ void log_instruction(struct cpu_t *cpu, const char *mnemonic, enum AddressingMod
     (void)mnemonic;
     (void)mode;
 
-    word pc = cpu->registers.pc - 1;
-    byte opcode = cpu_memory_read_byte_ghost(cpu, pc, true);
-    byte operand1 = cpu_memory_read_byte_ghost(cpu, pc + 1, true);
-    byte operand2 = cpu_memory_read_byte_ghost(cpu, pc + 2, true);
-
-    printf("%04X ", pc);
-
-    switch (mode) {
-        case IMPLICIT:
-            printf(" %02X        ", opcode);
-            printf("%s               ", mnemonic);
-            break;
-        case ACCUMULATOR:
-            printf(" %02X        ", opcode);
-            printf("%s A             ", mnemonic);
-            break;
-        case IMMEDIATE:
-            printf(" %02X %02X     ", opcode, operand1);
-            printf("%s #$%02X          ", mnemonic, operand1);
-            break;
-        case ZERO_PAGE:
-            printf(" %02X %02X     ", opcode, operand1);
-            printf("%s $%02X = %02X      ", mnemonic, operand1, cpu_memory_read_byte_ghost(cpu, operand1, true));
-            break;
-        case ZERO_PAGE_X:
-            printf(" %02X %02X     ", opcode, operand1);
-            printf("%s $%02X,X = %02X    ", mnemonic, operand1,
-                   cpu_memory_read_byte_ghost(cpu, (operand1 + cpu->registers.x) & 0xFF, true));
-            break;
-        case ZERO_PAGE_Y:
-            printf(" %02X %02X     ", opcode, operand1);
-            printf("%s $%02X,Y = %02X    ", mnemonic, operand1,
-                   cpu_memory_read_byte_ghost(cpu, (operand1 + cpu->registers.y) & 0xFF, true));
-            break;
-        case RELATIVE:
-            printf(" %02X %02X     ", opcode, operand1);
-            printf("%s $%04X         ", mnemonic, pc + 2 + (int8_t) operand1);
-            break;
-        case ABSOLUTE:
-            printf(" %02X %02X %02X  ", opcode, operand1, operand2);
-            printf("%s $%04X = %02X    ", mnemonic, (operand2 << 8) | operand1,
-                   cpu_memory_read_byte_ghost(cpu, (operand2 << 8) | operand1, true));
-            break;
-        case ABSOLUTE_X:
-            printf(" %02X %02X %02X  ", opcode, operand1, operand2);
-            printf("%s $%04X,X = %02X  ", mnemonic, (operand2 << 8) | operand1,
-                   cpu_memory_read_byte_ghost(cpu, ((operand2 << 8) | operand1) + cpu->registers.x, true));
-            break;
-        case ABSOLUTE_Y:
-            printf(" %02X %02X %02X  ", opcode, operand1, operand2);
-            printf("%s $%04X,Y = %02X  ", mnemonic, (operand2 << 8) | operand1,
-                   cpu_memory_read_byte_ghost(cpu, ((operand2 << 8) | operand1) + cpu->registers.y, true));
-            break;
-        case INDIRECT:
-            printf(" %02X %02X %02X ", opcode, operand1, operand2);
-            printf("%s ($%04X) = %04X ", mnemonic, (operand2 << 8) | operand1,
-                   (cpu_memory_read_byte_ghost(cpu, (operand2 << 8) | operand1, true) |
-                    (cpu_memory_read_byte_ghost(cpu, ((operand2 << 8) | (operand1 + 1)) & 0xFFFF, true) << 8)));
-            break;
-        case INDEXED_INDIRECT:
-            printf(" %02X %02X     ", opcode, operand1);
-            printf("%s ($%02X,X) = %02X  ", mnemonic, operand1, cpu_memory_read_byte_ghost(cpu,
-                                                                                           ((cpu_memory_read_byte_ghost(
-                                                                                                   cpu, (operand1 +
-                                                                                                         cpu->registers.x) &
-                                                                                                        0xFF, true)
-                                                                                                   << 8) |
-                                                                                            cpu_memory_read_byte_ghost(
-                                                                                                    cpu, (operand1 +
-                                                                                                          cpu->registers.x +
-                                                                                                          1) & 0xFF,
-                                                                                                    true)), true));
-            break;
-        case INDIRECT_INDEXED:
-            printf(" %02X %02X     ", opcode, operand1);
-            printf("%s ($%02X),Y = %02X  ", mnemonic, operand1, cpu_memory_read_byte_ghost(cpu,
-                                                                                           ((cpu_memory_read_byte_ghost(
-                                                                                                   cpu, operand1,
-                                                                                                   true) |
-                                                                                             (cpu_memory_read_byte_ghost(
-                                                                                                     cpu,
-                                                                                                     (operand1 + 1) &
-                                                                                                     0xFF, true)
-                                                                                                     << 8)) +
-                                                                                            cpu->registers.y), true));
-            break;
-        default:
-            printf("%02X           ", opcode);
-            printf("%s ???", mnemonic);
-            break;
-    }
-
-    word line = cpu->ppu->state.line;
-    if (line == 261) {
-        line = 0;
-    } else {
-        line += 1;
-    }
-
-    printf("              A:%02X X:%02X Y:%02X P:%02X SP:%02X PPU:%3d,%3d CYC:%lld\n",
-           cpu->registers.a, cpu->registers.x, cpu->registers.y, cpu->registers.p, cpu->registers.sp,
-           line, cpu->ppu->state.pixel, cpu->clock->cpu_cycles);
+    // word pc = cpu->registers.pc - 1;
+    // byte opcode = cpu_memory_read_byte_ghost(cpu, pc, true);
+    // byte operand1 = cpu_memory_read_byte_ghost(cpu, pc + 1, true);
+    // byte operand2 = cpu_memory_read_byte_ghost(cpu, pc + 2, true);
+    //
+    // printf("%04X ", pc);
+    //
+    // switch (mode) {
+    //     case IMPLICIT:
+    //         printf(" %02X        ", opcode);
+    //         printf("%s               ", mnemonic);
+    //         break;
+    //     case ACCUMULATOR:
+    //         printf(" %02X        ", opcode);
+    //         printf("%s A             ", mnemonic);
+    //         break;
+    //     case IMMEDIATE:
+    //         printf(" %02X %02X     ", opcode, operand1);
+    //         printf("%s #$%02X          ", mnemonic, operand1);
+    //         break;
+    //     case ZERO_PAGE:
+    //         printf(" %02X %02X     ", opcode, operand1);
+    //         printf("%s $%02X = %02X      ", mnemonic, operand1, cpu_memory_read_byte_ghost(cpu, operand1, true));
+    //         break;
+    //     case ZERO_PAGE_X:
+    //         printf(" %02X %02X     ", opcode, operand1);
+    //         printf("%s $%02X,X = %02X    ", mnemonic, operand1,
+    //                cpu_memory_read_byte_ghost(cpu, (operand1 + cpu->registers.x) & 0xFF, true));
+    //         break;
+    //     case ZERO_PAGE_Y:
+    //         printf(" %02X %02X     ", opcode, operand1);
+    //         printf("%s $%02X,Y = %02X    ", mnemonic, operand1,
+    //                cpu_memory_read_byte_ghost(cpu, (operand1 + cpu->registers.y) & 0xFF, true));
+    //         break;
+    //     case RELATIVE:
+    //         printf(" %02X %02X     ", opcode, operand1);
+    //         printf("%s $%04X         ", mnemonic, pc + 2 + (int8_t) operand1);
+    //         break;
+    //     case ABSOLUTE:
+    //         printf(" %02X %02X %02X  ", opcode, operand1, operand2);
+    //         printf("%s $%04X = %02X    ", mnemonic, (operand2 << 8) | operand1,
+    //                cpu_memory_read_byte_ghost(cpu, (operand2 << 8) | operand1, true));
+    //         break;
+    //     case ABSOLUTE_X:
+    //         printf(" %02X %02X %02X  ", opcode, operand1, operand2);
+    //         printf("%s $%04X,X = %02X  ", mnemonic, (operand2 << 8) | operand1,
+    //                cpu_memory_read_byte_ghost(cpu, ((operand2 << 8) | operand1) + cpu->registers.x, true));
+    //         break;
+    //     case ABSOLUTE_Y:
+    //         printf(" %02X %02X %02X  ", opcode, operand1, operand2);
+    //         printf("%s $%04X,Y = %02X  ", mnemonic, (operand2 << 8) | operand1,
+    //                cpu_memory_read_byte_ghost(cpu, ((operand2 << 8) | operand1) + cpu->registers.y, true));
+    //         break;
+    //     case INDIRECT:
+    //         printf(" %02X %02X %02X ", opcode, operand1, operand2);
+    //         printf("%s ($%04X) = %04X ", mnemonic, (operand2 << 8) | operand1,
+    //                (cpu_memory_read_byte_ghost(cpu, (operand2 << 8) | operand1, true) |
+    //                 (cpu_memory_read_byte_ghost(cpu, ((operand2 << 8) | (operand1 + 1)) & 0xFFFF, true) << 8)));
+    //         break;
+    //     case INDEXED_INDIRECT:
+    //         printf(" %02X %02X     ", opcode, operand1);
+    //         printf("%s ($%02X,X) = %02X  ", mnemonic, operand1, cpu_memory_read_byte_ghost(cpu,
+    //                                                                                        ((cpu_memory_read_byte_ghost(
+    //                                                                                                cpu, (operand1 +
+    //                                                                                                      cpu->registers.x) &
+    //                                                                                                     0xFF, true)
+    //                                                                                                << 8) |
+    //                                                                                         cpu_memory_read_byte_ghost(
+    //                                                                                                 cpu, (operand1 +
+    //                                                                                                       cpu->registers.x +
+    //                                                                                                       1) & 0xFF,
+    //                                                                                                 true)), true));
+    //         break;
+    //     case INDIRECT_INDEXED:
+    //         printf(" %02X %02X     ", opcode, operand1);
+    //         printf("%s ($%02X),Y = %02X  ", mnemonic, operand1, cpu_memory_read_byte_ghost(cpu,
+    //                                                                                        ((cpu_memory_read_byte_ghost(
+    //                                                                                                cpu, operand1,
+    //                                                                                                true) |
+    //                                                                                          (cpu_memory_read_byte_ghost(
+    //                                                                                                  cpu,
+    //                                                                                                  (operand1 + 1) &
+    //                                                                                                  0xFF, true)
+    //                                                                                                  << 8)) +
+    //                                                                                         cpu->registers.y), true));
+    //         break;
+    //     default:
+    //         printf("%02X           ", opcode);
+    //         printf("%s ???", mnemonic);
+    //         break;
+    // }
+    //
+    // word line = cpu->ppu->state.line;
+    // if (line == 261) {
+    //     line = 0;
+    // } else {
+    //     line += 1;
+    // }
+    //
+    // printf("              A:%02X X:%02X Y:%02X P:%02X SP:%02X PPU:%3d,%3d CYC:%lld\n",
+    //        cpu->registers.a, cpu->registers.x, cpu->registers.y, cpu->registers.p, cpu->registers.sp,
+    //        line, cpu->ppu->state.pixel, cpu->clock->cpu_cycles);
 }
 
 static inline void set_n(struct cpu_t* cpu, byte value) {
@@ -297,9 +297,9 @@ void adc_61(struct cpu_t* cpu) {
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte indirect_low = cpu_memory_read_byte(cpu, (arg + cpu->registers.x) & 0xFF);
-    byte indirect_high = cpu_memory_read_byte(cpu, (arg + cpu->registers.x + 1) & 0xFF);
+    byte indirect_high = cpu_memory_read_byte(cpu, ((arg + cpu->registers.x + 1) & 0xFF));
     word address = (indirect_high << 8) | indirect_low;
-    word value = cpu_memory_read_byte(cpu, address);
+    byte value = cpu_memory_read_byte(cpu, address);
     bool carry = is_flag_set(cpu->registers.p, CPU_STATUS_CARRY);
     byte original_a = cpu->registers.a;
     word result = (word)cpu->registers.a + value + carry;
@@ -327,7 +327,7 @@ void adc_65(struct cpu_t* cpu) {
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
     set_c(cpu, result);
-    if (((original_a ^ result) & (arg ^ result) & 0x80) != 0) {
+    if (((original_a ^ result) & (value ^ result) & 0x80) != 0) {
         cpu->registers.p |= CPU_STATUS_OVERFLOW;
     } else {
         cpu->registers.p &= ~CPU_STATUS_OVERFLOW;
@@ -366,7 +366,7 @@ void adc_6d(struct cpu_t* cpu) {
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
     set_c(cpu, result);
-    if (((original_a ^ result) & (arg ^ result) & 0x80) != 0) {
+    if (((original_a ^ result) & (value ^ result) & 0x80) != 0) {
         cpu->registers.p |= CPU_STATUS_OVERFLOW;
     } else {
         cpu->registers.p &= ~CPU_STATUS_OVERFLOW;
@@ -390,7 +390,7 @@ void adc_71(struct cpu_t* cpu) {
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
     set_c(cpu, result);
-    if (((original_a ^ result) & (arg ^ result) & 0x80) != 0) {
+    if (((original_a ^ result) & (value ^ result) & 0x80) != 0) {
         cpu->registers.p |= CPU_STATUS_OVERFLOW;
     } else {
         cpu->registers.p &= ~CPU_STATUS_OVERFLOW;
@@ -402,7 +402,7 @@ void adc_71(struct cpu_t* cpu) {
 }
 
 void adc_75(struct cpu_t* cpu) {
-    log_instruction(cpu, "adc", INDEXED_INDIRECT);
+    log_instruction(cpu, "adc", ZERO_PAGE_X);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte address = (arg + cpu->registers.x) & 0xFF;
@@ -414,7 +414,7 @@ void adc_75(struct cpu_t* cpu) {
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
     set_c(cpu, result);
-    if (((original_a ^ result) & (arg ^ result) & 0x80) != 0) {
+    if (((original_a ^ result) & (value ^ result) & 0x80) != 0) {
         cpu->registers.p |= CPU_STATUS_OVERFLOW;
     } else {
         cpu->registers.p &= ~CPU_STATUS_OVERFLOW;
@@ -435,7 +435,7 @@ void adc_79(struct cpu_t* cpu) {
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
     set_c(cpu, result);
-    if (((original_a ^ result) & (arg ^ result) & 0x80) != 0) {
+    if (((original_a ^ result) & (value ^ result) & 0x80) != 0) {
         cpu->registers.p |= CPU_STATUS_OVERFLOW;
     } else {
         cpu->registers.p &= ~CPU_STATUS_OVERFLOW;
@@ -459,7 +459,7 @@ void adc_7d(struct cpu_t* cpu) {
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
     set_c(cpu, result);
-    if (((original_a ^ result) & (arg ^ result) & 0x80) != 0) {
+    if (((original_a ^ result) & (value ^ result) & 0x80) != 0) {
         cpu->registers.p |= CPU_STATUS_OVERFLOW;
     } else {
         cpu->registers.p &= ~CPU_STATUS_OVERFLOW;
@@ -863,7 +863,7 @@ void cmp_c5(struct cpu_t* cpu) {
     word result = (word)cpu->registers.a - value;
     set_n(cpu, result & 0xFF);
     set_z(cpu, result & 0xFF);
-    if (cpu->registers.a >= arg) {
+    if (cpu->registers.a >= value) {
         cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
         cpu->registers.p &= ~CPU_STATUS_CARRY;
@@ -894,7 +894,7 @@ void cmp_cd(struct cpu_t* cpu) {
     word result = (word)cpu->registers.a - value;
     set_n(cpu, result & 0xFF);
     set_z(cpu, result & 0xFF);
-    if (cpu->registers.a >= arg) {
+    if (cpu->registers.a >= value) {
         cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
         cpu->registers.p &= ~CPU_STATUS_CARRY;
@@ -1236,8 +1236,8 @@ void eor_5d(struct cpu_t* cpu) {
     word address = cpu->registers.x + arg;
     byte value = cpu_memory_read_byte(cpu, address);
     cpu->registers.a ^= value;
-    set_n(cpu, value);
-    set_z(cpu, value);
+    set_n(cpu, cpu->registers.a);
+    set_z(cpu, cpu->registers.a);
     if ((arg & 0xFF00) != (address & 0xFF00)) {
         cpu->clock->cpu_cycles += 1;
     }
@@ -1386,7 +1386,9 @@ void lda_b1(struct cpu_t* cpu) {
     log_instruction(cpu, "lda", INDIRECT_INDEXED);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
-    word value = cpu_memory_read_word(cpu, arg);
+    byte low_byte = cpu_memory_read_byte(cpu, arg);
+    byte high_byte = cpu_memory_read_byte(cpu, (arg + 1) & 0xFF); // zero page wrap
+    word value = (high_byte << 8) | low_byte;
     word address = value + cpu->registers.y;
     byte result = cpu_memory_read_byte(cpu, address);
     cpu->registers.a = result;
@@ -2082,7 +2084,7 @@ void sbc_f1(struct cpu_t* cpu) {
     word address = base_address + cpu->registers.y;
     byte value = cpu_memory_read_byte(cpu, address);
     word result = cpu->registers.a + ~value + ((cpu->registers.p & CPU_STATUS_CARRY) ? 1 : 0);
-    if (result & 0x100) {
+    if (result < 0x100) {
         cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
         cpu->registers.p &= ~CPU_STATUS_CARRY;
@@ -2108,7 +2110,7 @@ void sbc_f5(struct cpu_t* cpu) {
     byte address = (arg + cpu->registers.x) & 0xFF;
     byte value = cpu_memory_read_byte(cpu, address);
     word result = cpu->registers.a + ~value + ((cpu->registers.p & CPU_STATUS_CARRY) ? 1 : 0);
-    if (result & 0x100) {
+    if (result < 0x100) {
         cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
         cpu->registers.p &= ~CPU_STATUS_CARRY;
@@ -2130,13 +2132,14 @@ void sbc_f9(struct cpu_t* cpu) {
     cpu->registers.pc += 2;
     word address = cpu->registers.y + arg;
     byte value = cpu_memory_read_byte(cpu, address);
+    byte original_a = cpu->registers.a;
     word result = cpu->registers.a + ~value + ((cpu->registers.p & CPU_STATUS_CARRY) ? 1 : 0);
-    if (result & 0x100) {
+    if (result < 0x100) {
         cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
         cpu->registers.p &= ~CPU_STATUS_CARRY;
     }
-    if ((cpu->registers.a ^ result) & (result ^ ~value) & 0x80) {
+    if (((original_a ^ result) & (original_a ^ value) & 0x80) != 0) {
         cpu->registers.p |= CPU_STATUS_OVERFLOW;
     } else {
         cpu->registers.p &= ~CPU_STATUS_OVERFLOW;
@@ -2154,20 +2157,20 @@ void sbc_fd(struct cpu_t* cpu) {
     log_instruction(cpu, "sbc", ABSOLUTE_X);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
-    word address = arg + cpu->registers.y;
+    word address = arg + cpu->registers.x;
     byte value = cpu_memory_read_byte(cpu, address);
-    word result = cpu->registers.a + ~value + ((cpu->registers.p & CPU_STATUS_CARRY) ? 1 : 0);
-    if (result & 0x100) {
+    word result = (word)cpu->registers.a - (word)value - ((cpu->registers.p & CPU_STATUS_CARRY) ? 0 : 1);
+    if (result < 0x100) {
         cpu->registers.p |= CPU_STATUS_CARRY;
     } else {
         cpu->registers.p &= ~CPU_STATUS_CARRY;
     }
-    if ((cpu->registers.a ^ result) & (result ^ ~value) & 0x80) {
+    if (((cpu->registers.a ^ result) & (cpu->registers.a ^ value) & 0x80) != 0) {
         cpu->registers.p |= CPU_STATUS_OVERFLOW;
     } else {
         cpu->registers.p &= ~CPU_STATUS_OVERFLOW;
     }
-    cpu->registers.a = (byte)result;
+    cpu->registers.a = result & 0xFF;
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
     if ((arg & 0xFF00) != (address & 0xFF00)) {
@@ -2204,7 +2207,6 @@ void sta_81(struct cpu_t* cpu) {
     cpu_memory_write_byte(cpu, address, cpu->registers.a);
     cpu->clock->cpu_cycles += 6;
 }
-
 
 void sta_85(struct cpu_t* cpu) {
     log_instruction(cpu, "sta", ZERO_PAGE);
