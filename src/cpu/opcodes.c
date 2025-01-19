@@ -609,7 +609,7 @@ void asl_16(struct cpu_t* cpu) {
 }
 
 void asl_1e(struct cpu_t* cpu) {
-    //log_instruction(cpu, "asl", ABSOLUTE_X);
+    log_instruction(cpu, "asl", ABSOLUTE_X);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     word address = arg + cpu->registers.x;
@@ -627,7 +627,7 @@ void asl_1e(struct cpu_t* cpu) {
 }
 
 void bcc_90(struct cpu_t* cpu) {
-    //log_instruction(cpu, "bcc", RELATIVE);
+    log_instruction(cpu, "bcc", RELATIVE);
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     word original_pc = cpu->registers.pc;
@@ -643,7 +643,7 @@ void bcc_90(struct cpu_t* cpu) {
 }
 
 void bcs_b0(struct cpu_t* cpu) {
-    //log_instruction(cpu, "bcs", RELATIVE);
+    log_instruction(cpu, "bcs", RELATIVE);
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
     word original_pc = cpu->registers.pc + 1;
     cpu->registers.pc += 1;
@@ -659,7 +659,7 @@ void bcs_b0(struct cpu_t* cpu) {
 }
 
 void beq_f0(struct cpu_t* cpu) {
-    //log_instruction(cpu, "beq", RELATIVE);
+    log_instruction(cpu, "beq", RELATIVE);
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
     word original_pc = cpu->registers.pc + 1;
     cpu->registers.pc += 1;
@@ -675,7 +675,7 @@ void beq_f0(struct cpu_t* cpu) {
 }
 
 void bit_24(struct cpu_t* cpu) {
-    //log_instruction(cpu, "bit", ZERO_PAGE);
+    log_instruction(cpu, "bit", ZERO_PAGE);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte value = cpu_memory_read_byte(cpu, arg);
@@ -688,7 +688,7 @@ void bit_24(struct cpu_t* cpu) {
 }
 
 void bit_2c(struct cpu_t* cpu) {
-    //log_instruction(cpu, "bit", ABSOLUTE);
+    log_instruction(cpu, "bit", ABSOLUTE);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     byte value = cpu_memory_read_byte(cpu, arg);
@@ -701,7 +701,7 @@ void bit_2c(struct cpu_t* cpu) {
 }
 
 void bmi_30(struct cpu_t* cpu) {
-    //log_instruction(cpu, "bmi", RELATIVE);
+    log_instruction(cpu, "bmi", RELATIVE);
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
     word original_pc = cpu->registers.pc + 1;
     cpu->registers.pc += 1;
@@ -717,7 +717,7 @@ void bmi_30(struct cpu_t* cpu) {
 }
 
 void bne_d0(struct cpu_t* cpu) {
-    //log_instruction(cpu, "bne", RELATIVE);
+    log_instruction(cpu, "bne", RELATIVE);
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
     word original_pc = cpu->registers.pc + 1;
     cpu->registers.pc += 1;
@@ -733,7 +733,7 @@ void bne_d0(struct cpu_t* cpu) {
 }
 
 void bpl_10(struct cpu_t* cpu) {
-    //log_instruction(cpu, "bpl", RELATIVE);
+    log_instruction(cpu, "bpl", RELATIVE);
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
     word original_pc = cpu->registers.pc + 1;
     cpu->registers.pc += 1;
@@ -749,7 +749,7 @@ void bpl_10(struct cpu_t* cpu) {
 }
 
 void bvc_50(struct cpu_t* cpu) {
-    //log_instruction(cpu, "bvc", RELATIVE);
+    log_instruction(cpu, "bvc", RELATIVE);
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
     word original_pc = cpu->registers.pc + 1;
     cpu->registers.pc += 1;
@@ -765,7 +765,7 @@ void bvc_50(struct cpu_t* cpu) {
 }
 
 void bvs_70(struct cpu_t* cpu) {
-    //log_instruction(cpu, "bvs", RELATIVE);
+    log_instruction(cpu, "bvs", RELATIVE);
     sbyte arg = (sbyte)cpu_memory_read_byte(cpu, cpu->registers.pc);
     word original_pc = cpu->registers.pc + 1;
     cpu->registers.pc += 1;
@@ -781,28 +781,28 @@ void bvs_70(struct cpu_t* cpu) {
 }
 
 void clc_18(struct cpu_t* cpu) {
-    //log_instruction(cpu, "clc", IMPLICIT);
+    log_instruction(cpu, "clc", IMPLICIT);
     byte value = clear_flag(cpu->registers.p, CPU_STATUS_CARRY);
     cpu->registers.p = value;
     cpu->clock->cpu_cycles += 2;
 }
 
 void cld_d8(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cld", IMPLICIT);
+    log_instruction(cpu, "cld", IMPLICIT);
     byte value = clear_flag(cpu->registers.p, CPU_STATUS_DECIMAL);
     cpu->registers.p = value;
     cpu->clock->cpu_cycles += 2;
 }
 
 void clv_b8(struct cpu_t* cpu) {
-    //log_instruction(cpu, "clv", IMPLICIT);
+    log_instruction(cpu, "clv", IMPLICIT);
     byte value = clear_flag(cpu->registers.p, CPU_STATUS_OVERFLOW);
     cpu->registers.p = value;
     cpu->clock->cpu_cycles += 2;
 }
 
 void cmp_c1(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cmp", INDEXED_INDIRECT);
+    log_instruction(cpu, "cmp", INDEXED_INDIRECT);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte indirect_low = cpu_memory_read_byte(cpu, (arg + cpu->registers.x) & 0xFF);
@@ -821,7 +821,7 @@ void cmp_c1(struct cpu_t* cpu) {
 }
 
 void cmp_c5(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cmp", ZERO_PAGE);
+    log_instruction(cpu, "cmp", ZERO_PAGE);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte value = cpu_memory_read_byte(cpu, arg);
@@ -837,7 +837,7 @@ void cmp_c5(struct cpu_t* cpu) {
 }
 
 void cmp_c9(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cmp", IMMEDIATE);
+    log_instruction(cpu, "cmp", IMMEDIATE);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     word result = (word)cpu->registers.a - arg;
@@ -852,7 +852,7 @@ void cmp_c9(struct cpu_t* cpu) {
 }
 
 void cmp_cd(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cmp", ABSOLUTE);
+    log_instruction(cpu, "cmp", ABSOLUTE);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     word value = cpu_memory_read_byte(cpu, arg);
@@ -868,7 +868,7 @@ void cmp_cd(struct cpu_t* cpu) {
 }
 
 void cmp_d1(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cmp", INDIRECT_INDEXED);
+    log_instruction(cpu, "cmp", INDIRECT_INDEXED);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte low_byte = cpu_memory_read_byte(cpu, arg);
@@ -891,7 +891,7 @@ void cmp_d1(struct cpu_t* cpu) {
 }
 
 void cmp_d5(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cmp", ZERO_PAGE_X);
+    log_instruction(cpu, "cmp", ZERO_PAGE_X);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte address = (arg + cpu->registers.x) & 0xFF;
@@ -908,7 +908,7 @@ void cmp_d5(struct cpu_t* cpu) {
 }
 
 void cmp_d9(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cmp", ABSOLUTE_Y);
+    log_instruction(cpu, "cmp", ABSOLUTE_Y);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     word address = arg + cpu->registers.y;
@@ -928,7 +928,7 @@ void cmp_d9(struct cpu_t* cpu) {
 }
 
 void cmp_dd(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cmp", ABSOLUTE_X);
+    log_instruction(cpu, "cmp", ABSOLUTE_X);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     word address = arg + cpu->registers.x;
@@ -948,7 +948,7 @@ void cmp_dd(struct cpu_t* cpu) {
 }
 
 void cpx_e0(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cpx", IMMEDIATE);
+    log_instruction(cpu, "cpx", IMMEDIATE);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     word result = (word)cpu->registers.x - arg;
@@ -963,7 +963,7 @@ void cpx_e0(struct cpu_t* cpu) {
 }
 
 void cpx_e4(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cpx", ZERO_PAGE);
+    log_instruction(cpu, "cpx", ZERO_PAGE);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte value = cpu_memory_read_byte(cpu, arg);
@@ -979,7 +979,7 @@ void cpx_e4(struct cpu_t* cpu) {
 }
 
 void cpx_ec(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cpx", ABSOLUTE);
+    log_instruction(cpu, "cpx", ABSOLUTE);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     byte value = cpu_memory_read_byte(cpu, arg);
@@ -995,7 +995,7 @@ void cpx_ec(struct cpu_t* cpu) {
 }
 
 void cpy_c0(struct cpu_t* cpu) {
-    //log_instruction(cpu, "cpy", IMMEDIATE);
+    log_instruction(cpu, "cpy", IMMEDIATE);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     word result = (word)cpu->registers.y - arg;
@@ -2160,7 +2160,7 @@ void sei_78(struct cpu_t* cpu) {
 }
 
 void sta_81(struct cpu_t* cpu) {
-    //log_instruction(cpu, "sta", INDEXED_INDIRECT);
+    log_instruction(cpu, "sta", INDEXED_INDIRECT);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte indirect_low = cpu_memory_read_byte(cpu, (arg + cpu->registers.x) & 0xFF);
@@ -2172,7 +2172,7 @@ void sta_81(struct cpu_t* cpu) {
 
 
 void sta_85(struct cpu_t* cpu) {
-    //log_instruction(cpu, "sta", ZERO_PAGE);
+    log_instruction(cpu, "sta", ZERO_PAGE);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     cpu_memory_write_byte(cpu, arg, cpu->registers.a);
@@ -2180,7 +2180,7 @@ void sta_85(struct cpu_t* cpu) {
 }
 
 void sta_8d(struct cpu_t* cpu) {
-    //log_instruction(cpu, "sta", ABSOLUTE);
+    log_instruction(cpu, "sta", ABSOLUTE);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     cpu_memory_write_byte(cpu, arg, cpu->registers.a);
@@ -2188,7 +2188,7 @@ void sta_8d(struct cpu_t* cpu) {
 }
 
 void sta_91(struct cpu_t* cpu) {
-    //log_instruction(cpu, "sta", INDIRECT_INDEXED);
+    log_instruction(cpu, "sta", INDIRECT_INDEXED);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     word value = cpu_memory_read_word(cpu, arg);
@@ -2198,7 +2198,7 @@ void sta_91(struct cpu_t* cpu) {
 }
 
 void sta_95(struct cpu_t* cpu) {
-    //log_instruction(cpu, "sta", ZERO_PAGE_X);
+    log_instruction(cpu, "sta", ZERO_PAGE_X);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     word address = (cpu->registers.x + arg) & 0xFF;
@@ -2207,7 +2207,7 @@ void sta_95(struct cpu_t* cpu) {
 }
 
 void sta_99(struct cpu_t* cpu) {
-    //log_instruction(cpu, "sta", ABSOLUTE_Y);
+    log_instruction(cpu, "sta", ABSOLUTE_Y);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     word address = cpu->registers.y + arg;
@@ -2216,7 +2216,7 @@ void sta_99(struct cpu_t* cpu) {
 }
 
 void sta_9d(struct cpu_t* cpu) {
-    //log_instruction(cpu, "sta", ABSOLUTE_X);
+    log_instruction(cpu, "sta", ABSOLUTE_X);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     word address = cpu->registers.x + arg;
@@ -2225,7 +2225,7 @@ void sta_9d(struct cpu_t* cpu) {
 }
 
 void stx_86(struct cpu_t* cpu) {
-    //log_instruction(cpu, "stx", ZERO_PAGE);
+    log_instruction(cpu, "stx", ZERO_PAGE);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     cpu_memory_write_byte(cpu, arg, cpu->registers.x);
@@ -2233,7 +2233,7 @@ void stx_86(struct cpu_t* cpu) {
 }
 
 void stx_8e(struct cpu_t* cpu) {
-    //log_instruction(cpu, "stx", ABSOLUTE);
+    log_instruction(cpu, "stx", ABSOLUTE);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     cpu_memory_write_byte(cpu, arg, cpu->registers.x);
@@ -2241,7 +2241,7 @@ void stx_8e(struct cpu_t* cpu) {
 }
 
 void stx_96(struct cpu_t* cpu) {
-    //log_instruction(cpu, "stx", ZERO_PAGE_Y);
+    log_instruction(cpu, "stx", ZERO_PAGE_Y);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte address = (arg + cpu->registers.y) & 0xFF;
@@ -2250,7 +2250,7 @@ void stx_96(struct cpu_t* cpu) {
 }
 
 void sty_84(struct cpu_t* cpu) {
-    //log_instruction(cpu, "sty", ZERO_PAGE);
+    log_instruction(cpu, "sty", ZERO_PAGE);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     cpu_memory_write_byte(cpu, arg, cpu->registers.y);
@@ -2258,7 +2258,7 @@ void sty_84(struct cpu_t* cpu) {
 }
 
 void sty_8c(struct cpu_t* cpu) {
-    //log_instruction(cpu, "sty", ABSOLUTE);
+    log_instruction(cpu, "sty", ABSOLUTE);
     word arg = cpu_memory_read_word(cpu, cpu->registers.pc);
     cpu->registers.pc += 2;
     cpu_memory_write_byte(cpu, arg, cpu->registers.y);
@@ -2266,7 +2266,7 @@ void sty_8c(struct cpu_t* cpu) {
 }
 
 void sty_94(struct cpu_t* cpu) {
-    //log_instruction(cpu, "sty", ZERO_PAGE_X);
+    log_instruction(cpu, "sty", ZERO_PAGE_X);
     byte arg = cpu_memory_read_byte(cpu, cpu->registers.pc);
     cpu->registers.pc += 1;
     byte address = (arg + cpu->registers.x) & 0xFF;
@@ -2275,7 +2275,7 @@ void sty_94(struct cpu_t* cpu) {
 }
 
 void tax_aa(struct cpu_t* cpu) {
-    //log_instruction(cpu, "tax", IMPLICIT);
+    log_instruction(cpu, "tax", IMPLICIT);
     cpu->registers.x = cpu->registers.a;
     set_n(cpu, cpu->registers.x);
     set_z(cpu, cpu->registers.x);
@@ -2283,7 +2283,7 @@ void tax_aa(struct cpu_t* cpu) {
 }
 
 void tay_a8(struct cpu_t* cpu) {
-    //log_instruction(cpu, "tay", IMPLICIT);
+    log_instruction(cpu, "tay", IMPLICIT);
     cpu->registers.y = cpu->registers.a;
     set_n(cpu, cpu->registers.y);
     set_z(cpu, cpu->registers.y);
@@ -2291,7 +2291,7 @@ void tay_a8(struct cpu_t* cpu) {
 }
 
 void tsx_ba(struct cpu_t* cpu) {
-    //log_instruction(cpu, "tsx", IMPLICIT);
+    log_instruction(cpu, "tsx", IMPLICIT);
     cpu->registers.x = cpu->registers.sp;
     set_n(cpu, cpu->registers.x);
     set_z(cpu, cpu->registers.x);
@@ -2299,7 +2299,7 @@ void tsx_ba(struct cpu_t* cpu) {
 }
 
 void txa_8a(struct cpu_t* cpu) {
-    //log_instruction(cpu, "txa", IMPLICIT);
+    log_instruction(cpu, "txa", IMPLICIT);
     cpu->registers.a = cpu->registers.x;
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
@@ -2307,13 +2307,13 @@ void txa_8a(struct cpu_t* cpu) {
 }
 
 void txs_9a(struct cpu_t* cpu) {
-    //log_instruction(cpu, "txs", IMPLICIT);
+    log_instruction(cpu, "txs", IMPLICIT);
     cpu->registers.sp = cpu->registers.x;
     cpu->clock->cpu_cycles += 2;
 }
 
 void tya_98(struct cpu_t* cpu) {
-    //log_instruction(cpu, "tya", IMPLICIT);
+    log_instruction(cpu, "tya", IMPLICIT);
     cpu->registers.a = cpu->registers.y;
     set_n(cpu, cpu->registers.a);
     set_z(cpu, cpu->registers.a);
