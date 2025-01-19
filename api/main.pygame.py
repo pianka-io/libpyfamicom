@@ -1,6 +1,5 @@
 import time
 import pygame
-import pytendo
 
 from emu.emulator import Emulator
 
