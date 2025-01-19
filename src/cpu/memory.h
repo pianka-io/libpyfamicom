@@ -19,6 +19,7 @@ struct cpu_memory_t* cpu_memory_create(struct rom_t* rom);
 void cpu_memory_destroy(struct cpu_memory_t*);
 
 byte cpu_memory_read_byte(struct cpu_t*, word);
+byte cpu_memory_read_byte_ghost(struct cpu_t*, word, bool);
 word cpu_memory_read_word(struct cpu_t* cpu, word);
 void cpu_memory_write_byte(struct cpu_t*, word, byte);
 

@@ -26,6 +26,10 @@ void cpu_memory_destroy(struct cpu_memory_t* memory) {
 }
 
 byte cpu_memory_read_byte(struct cpu_t* cpu, word address) {
+    return cpu_memory_read_byte_ghost(cpu, address, false);
+}
+
+byte cpu_memory_read_byte_ghost(struct cpu_t* cpu, word address, bool ghost) {
     address = translate_cpu_address(cpu, address);
     byte status;
 
@@ -38,7 +42,9 @@ byte cpu_memory_read_byte(struct cpu_t* cpu, word address) {
             return cpu->ppu->registers.ppumask;
         case PPU_REGISTER_PPUSTATUS:
             status = cpu->ppu->registers.ppustatus;
-            cpu->ppu->registers.ppustatus = clear_flag(cpu->ppu->registers.ppustatus, PPUSTATUS_VBLANK);
+            if (!ghost) {
+                cpu->ppu->registers.ppustatus = clear_flag(cpu->ppu->registers.ppustatus, PPUSTATUS_VBLANK);
+            }
             //printf("PPUSTATUS_READ: Value: 0x%02X (VBLANK Cleared)\n", status);
             return status;
         case PPU_REGISTER_OAMADDR:
@@ -70,7 +76,9 @@ byte cpu_memory_read_byte(struct cpu_t* cpu, word address) {
             return cpu->ppu->registers.ppudata;
         case INPUT_REGISTER_ONE:
             status = cpu->controller->shift_register & 1;
-            *(byte*)&cpu->controller->shift_register >>= 1;
+            if (!ghost) {
+                *(byte *) &cpu->controller->shift_register >>= 1;
+            }
 //            printf("INPUT_READ: Value: 0x%02X, ShiftRegister: 0x%02X\n", status | 0x40, *(byte*)&cpu->controller->shift_register);
             return (status | 0x40);
         default:
