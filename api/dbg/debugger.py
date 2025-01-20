@@ -131,6 +131,8 @@ class Debugger:
                             pass
                         with dpg.tab(label="PPU", tag="tab_ppu"):
                             pass
+                        with dpg.tab(label="OAM", tag="tab_oam"):
+                            pass
                     with dpg.child_window(width=400, height=177 * scale_factor + 1, tag="memory_window"):
                         with dpg.drawlist(width=380, height=len(lines) * 20, tag="memory_drawlist"):
                             pass
@@ -278,10 +280,14 @@ class Debugger:
                 break
 
     def draw_memory(self):
-        if self.memory_tab_tag == "tab_cpu":
-            memory = pytendo.dbg_cpu_ram(self.emulator.emu)
-        else:
-            memory = pytendo.dbg_ppu_ram(self.emulator.emu)
+        match self.memory_tab_tag:
+            case "tab_cpu":
+                memory = pytendo.dbg_cpu_ram(self.emulator.emu)
+            case "tab_ppu":
+                memory = pytendo.dbg_ppu_ram(self.emulator.emu)
+            case "tab_oam":
+                memory = pytendo.dbg_oam_ram(self.emulator.emu)
+
         bytes_per_line = 16
         memory_lines = []
 
@@ -300,5 +306,3 @@ class Debugger:
         dpg.configure_item("memory_drawlist", height=content_height)
         dpg.delete_item("memory_drawlist", children_only=True)
         dpg.draw_text([5, 5], memory_text, color=(255, 255, 255), tag="memory_text", parent="memory_drawlist")
-
-
