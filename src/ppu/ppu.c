@@ -120,15 +120,81 @@ void ppu_render(struct ppu_t* ppu, word line, byte pixel) {
     byte tile_col = 7 - (pixel % 8);
     byte pixel_value = (((high_byte >> tile_col) & 1) << 1) | ((low_byte >> tile_col) & 1);
 
-    // palette address
-    word palette_address = 0x3F00 + (palette_index * 4) + pixel_value;
-    byte color_index = ppu_memory_read_byte(ppu, palette_address);
+    if (pixel_value == 0) {
+        // handle transparency
+        word universal_palette_address = 0x3F00;
+        byte universal_color_index = ppu_memory_read_byte(ppu, universal_palette_address);
+        byte r, g, b;
+        ppu_palette_color(ppu, universal_color_index, &r, &g, &b);
+        ppu_write_pixel(ppu, pixel, line, r, g, b);
+    } else {
+        // palette address
+        word palette_address = 0x3F00 + (palette_index * 4) + pixel_value;
+        byte color_index = ppu_memory_read_byte(ppu, palette_address);
 
-    // convert color index to palette's rgb
-    byte r, g, b;
-    ppu_palette_color(ppu, color_index, &r, &g, &b);
-    ppu_write_pixel(ppu, pixel, line, r, g, b);
+        // convert color index to palette's rgb
+        byte r, g, b;
+        ppu_palette_color(ppu, color_index, &r, &g, &b);
+        ppu_write_pixel(ppu, pixel, line, r, g, b);
+    }
 
+    // sprite last
+    ppu_render_sprite_pixel(ppu, line, pixel);
+}
+
+void ppu_render_sprite_pixel(struct ppu_t* ppu, word line, byte pixel) {
+    for (int i = 63; i >= 0; i--) {
+        byte* sprite = &ppu->memory->oam[i * 4];
+
+        byte sprite_y = sprite[0] + 1;
+        if (line < sprite_y || line >= sprite_y + ppu->state.sprite_size) {
+            continue;
+        }
+
+        byte sprite_tile_index = sprite[1];
+        byte sprite_attributes = sprite[2];
+        byte sprite_x = sprite[3];
+
+        if (pixel < sprite_x || pixel >= sprite_x + 8) {
+            continue;
+        }
+
+        byte row = line - sprite_y;
+        if (sprite_attributes & 0x80) {
+            row = (ppu->state.sprite_size - 1) - row;
+        }
+
+        byte col = pixel - sprite_x;
+        if (sprite_attributes & 0x40) {
+            col = 7 - col;
+        }
+
+        word pattern_table = ppu->state.sprite_pattern_table;
+        if (ppu->state.sprite_size == 16) {
+            pattern_table = (sprite_tile_index & 1) ? 0x1000 : 0x0000;
+            sprite_tile_index &= 0xFE;
+        }
+        word tile_address = pattern_table + sprite_tile_index * 16 + row;
+
+        byte low_byte = ppu_memory_read_byte(ppu, tile_address);
+        byte high_byte = ppu_memory_read_byte(ppu, tile_address + 8);
+
+        byte bit = 7 - col;
+        byte pixel_value = ((high_byte >> bit) & 1) << 1 | ((low_byte >> bit) & 1);
+        if (pixel_value == 0) {
+            continue; // transparent
+        }
+
+        byte palette_index = (sprite_attributes & 0x03);
+        word palette_address = 0x3F10 + palette_index * 4 + pixel_value;
+        byte color_index = ppu_memory_read_byte(ppu, palette_address);
+
+        byte r, g, b;
+        ppu_palette_color(ppu, color_index, &r, &g, &b);
+        ppu_write_pixel(ppu, pixel, line, r, g, b);
+
+        return;
+    }
 }
 
 byte ppu_pattern(struct ppu_t* ppu, byte tile_x, byte tile_y) {

@@ -115,6 +115,7 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
             cpu->ppu->state.sprite_pattern_table = PATTERN_TABLE_OFFSETS[is_flag_set(cpu->ppu->registers.ppuctrl, PPUCTRL_SPRITE_PATTERN_TABLE)];
             cpu->ppu->state.background_pattern_table = PATTERN_TABLE_OFFSETS[is_flag_set(cpu->ppu->registers.ppuctrl, PPUCTRL_BACKGROUND_PATTERN_TABLE)];
             cpu->ppu->state.vram_increment = is_flag_set(cpu->ppu->registers.ppuctrl, PPUCTRL_VRAM_INCREMENT) ? 32 : 1;
+            cpu->ppu->state.sprite_size = is_flag_set(cpu->ppu->registers.ppuctrl, PPUCTRL_SPRITE_SIZE) ? 16 : 8;
             break;
         case PPU_REGISTER_PPUMASK:
             cpu->ppu->registers.ppumask = value;

@@ -52,7 +52,11 @@ word translate_ppu_address(struct ppu_t* ppu, word address) {
     }
 
     if (address < 0x4000) {
-        return 0x3F00 | (address & 0x1F);
+        address = 0x3F00 | (address & 0x1F);
+        if ((address & 0x13) == 0x10) {
+            address &= ~0x10;
+        }
+        return address;
     }
 
     return address;

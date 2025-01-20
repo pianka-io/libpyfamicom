@@ -29,6 +29,7 @@ typedef struct ppu_state_t {
     byte mirroring_mode;
     word name_table_offset;
     word sprite_pattern_table;
+    byte sprite_size;
     word background_pattern_table;
 
     word line;
@@ -56,6 +57,7 @@ void ppu_tick(struct ppu_t*);
 void ppu_increment(struct ppu_t*, uint16_t, uint16_t);
 void ppu_prerender(struct ppu_t*, uint16_t, uint16_t);
 void ppu_render(struct ppu_t*, word, byte);
+void ppu_render_sprite_pixel(struct ppu_t*, word, byte);
 byte ppu_pattern(struct ppu_t*, byte, byte);
 void ppu_palette_color(struct ppu_t* ppu, byte color_index, byte*, byte*, byte*);
 void ppu_write_pixel(struct ppu_t* ppu, byte x, byte y, byte r, byte g, byte b);
