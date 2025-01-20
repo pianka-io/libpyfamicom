@@ -161,6 +161,10 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
 //                printf("INPUT_WRITE: Strobe Cleared\n");
             }
             break;
+        case OAM_DMA:
+            byte* dma = &cpu->memory->data[value << 8];
+            memcpy(cpu->ppu->memory->oam, dma, 256);
+            break;
         default:
             cpu->memory->data[address] = value;
             break;

@@ -62,6 +62,8 @@ static const word PPU_REGISTER_PPUSCROLL = 0x2005;
 static const word PPU_REGISTER_PPUADDR = 0x2006;
 static const word PPU_REGISTER_PPUDATA = 0x2007;
 
+static const word OAM_DMA = 0x4014;
+
 static const word INPUT_REGISTER_ONE = 0x4016;
 static const word INPUT_REGISTER_TWO = 0x4017;
 
