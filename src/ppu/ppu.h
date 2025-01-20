@@ -26,6 +26,7 @@ typedef struct ppu_registers_t {
 
 typedef struct ppu_state_t {
     byte vram_increment;
+    byte vram_read_buffer;
     byte mirroring_mode;
     word name_table_offset;
     word sprite_pattern_table;

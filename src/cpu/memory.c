@@ -33,20 +33,18 @@ byte cpu_memory_read_byte_ghost(struct cpu_t* cpu, word address, bool ghost) {
     address = translate_cpu_address(cpu, address);
     byte status;
     byte value;
+    word vram_address;
 
     switch (address) {
         case PPU_REGISTER_PPUCTRL:
-            //printf("PPUCTRL_READ: Value: 0x%02X\n", cpu->ppu->registers.ppuctrl);
             return cpu->ppu->registers.ppuctrl;
         case PPU_REGISTER_PPUMASK:
-            //printf("PPUMASK_READ: Value: 0x%02X\n", cpu->ppu->registers.ppumask);
             return cpu->ppu->registers.ppumask;
         case PPU_REGISTER_PPUSTATUS:
             status = cpu->ppu->registers.ppustatus;
             if (!ghost) {
                 cpu->ppu->registers.ppustatus = clear_flag(cpu->ppu->registers.ppustatus, PPUSTATUS_VBLANK);
             }
-            //printf("PPUSTATUS_READ: Value: 0x%02X (VBLANK Cleared)\n", status);
             return status;
         case PPU_REGISTER_OAMADDR:
             printf("OAMADDR_READ: Value: 0x%02X\n", cpu->ppu->registers.oamaddr);
@@ -63,7 +61,6 @@ byte cpu_memory_read_byte_ghost(struct cpu_t* cpu, word address, bool ghost) {
                 cpu->memory->ppuscroll_read ^= 1;
             }
 
-            // printf("PPUSCROLL_READ: Value: 0x%02X, ReadPhase: %d\n", value, cpu->memory->ppuscroll_read);
             return value;
         case PPU_REGISTER_PPUADDR:
             value = (cpu->memory->ppuaddr_read ^ 1) ?
@@ -76,14 +73,22 @@ byte cpu_memory_read_byte_ghost(struct cpu_t* cpu, word address, bool ghost) {
 
             return value;
         case PPU_REGISTER_PPUDATA:
-            //printf("PPUDATA_READ: Value: 0x%02X\n", cpu->ppu->registers.ppudata);
-            return cpu->ppu->registers.ppudata;
+            vram_address = cpu->ppu->registers.ppuaddr & 0x3FFF;
+            value = cpu->ppu->state.vram_read_buffer;
+            cpu->ppu->state.vram_read_buffer = ppu_memory_read_byte(cpu->ppu, vram_address);
+            cpu->ppu->registers.ppuaddr += cpu->ppu->state.vram_increment;
+
+            if (vram_address >= 0x3F00) {
+                cpu->ppu->state.vram_read_buffer = ppu_memory_read_byte(cpu->ppu, vram_address & 0x2FFF);
+                return ppu_memory_read_byte(cpu->ppu, vram_address);
+            } else {
+                return value;
+            }
         case INPUT_REGISTER_ONE:
             status = cpu->controller->shift_register & 1;
             if (!ghost) {
                 *(byte *) &cpu->controller->shift_register >>= 1;
             }
-//            printf("INPUT_READ: Value: 0x%02X, ShiftRegister: 0x%02X\n", status | 0x40, *(byte*)&cpu->controller->shift_register);
             return (status | 0x40);
         default:
             return cpu->memory->data[address];
