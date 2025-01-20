@@ -60,6 +60,7 @@ void ppu_tick(struct ppu_t* ppu) {
             return;
         }
         if (pixel == 1) {
+            // TODO this is clearing at ~2274 cpu cycles instead of 2270
             ppu->registers.ppustatus &= ~PPUSTATUS_VBLANK;
         }
     } else if (line <= PPU_PHASE_LINESCAN) {

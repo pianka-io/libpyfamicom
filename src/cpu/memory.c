@@ -52,8 +52,8 @@ byte cpu_memory_read_byte_ghost(struct cpu_t* cpu, word address, bool ghost) {
             printf("OAMADDR_READ: Value: 0x%02X\n", cpu->ppu->registers.oamaddr);
             return cpu->ppu->registers.oamaddr;
         case PPU_REGISTER_OAMDATA:
-            printf("OAMDATA_READ: Addr: 0x%02X, Value: 0x%02X\n", cpu->ppu->registers.oamaddr, cpu->ppu->registers.oamdata);
-            return oam_memory_read_byte(cpu->ppu, cpu->ppu->registers.oamdata);
+            printf("OAMDATA_READ: Value: 0x%02X\n", oam_memory_read_byte(cpu->ppu, cpu->ppu->registers.oamaddr));
+            return oam_memory_read_byte(cpu->ppu, cpu->ppu->registers.oamaddr);
         case PPU_REGISTER_PPUSCROLL:
             value = (cpu->memory->ppuscroll_read ^ 1) ?
                     (cpu->ppu->registers.ppuscroll & 0xFF) :
@@ -99,6 +99,8 @@ word cpu_memory_read_word(struct cpu_t* cpu, word address) {
 
 void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
     address = translate_cpu_address(cpu, address);
+    byte* dma;
+    byte start_address;
 
     switch (address) {
         case PPU_REGISTER_PPUCTRL:
@@ -130,13 +132,14 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
             printf("OAMADDR_WRITE: Value: 0x%02X\n", value);
             break;
         case PPU_REGISTER_OAMDATA:
-            oam_memory_write_byte(cpu->ppu, cpu->ppu->registers.oamdata, value);
-            printf("OAMDATA_WRITE: Addr: 0x%02X, Value: 0x%02X\n", cpu->ppu->registers.oamaddr, value);
+            printf("OAMDATA_WRITE: Value: 0x%02X\n", value);
+            oam_memory_write_byte(cpu->ppu, cpu->ppu->registers.oamaddr, value);
+            cpu->ppu->registers.oamaddr += 1;
             break;
         case PPU_REGISTER_PPUSCROLL:
             cpu->ppu->registers.ppuscroll &= ~(0xFF << (cpu->memory->ppuscroll_write * 8));
             cpu->ppu->registers.ppuscroll |= (value << (cpu->memory->ppuscroll_write * 8));
-            // printf("PPUSCROLL_WRITE: Value: 0x%02X, WritePhase: %d\n", value, cpu->memory->ppuscroll_write);
+            printf("PPUSCROLL_WRITE: Value: $%02x Final $%04x, WritePhase: %d\n", value, cpu->ppu->registers.ppuscroll, cpu->memory->ppuscroll_write);
             cpu->memory->ppuscroll_write ^= 1;
             break;
         case PPU_REGISTER_PPUADDR:
@@ -163,8 +166,13 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
             }
             break;
         case OAM_DMA:
-            byte* dma = &cpu->memory->data[value << 8];
-            memcpy(cpu->ppu->memory->oam, dma, 256);
+            dma = &cpu->memory->data[value << 8];
+            start_address = cpu->ppu->registers.oamaddr;
+
+            for (int i = 0; i < 256; i++) {
+                cpu->ppu->memory->oam[start_address] = dma[i];
+                start_address = (start_address + 1) & 0xFF;
+            }
             break;
         default:
             cpu->memory->data[address] = value;

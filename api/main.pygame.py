@@ -3,7 +3,7 @@ import pygame
 
 from emu.emulator import Emulator
 
-emu = Emulator("pytendo", "bin/pals/2C02G.pal", "bin/roms/SpriteTest.nes")
+emu = Emulator("pytendo", "bin/pals/2C02G.pal", "bin/roms/ppu/vbl_clear_time.nes")
 clock = pygame.time.Clock()
 pygame.init()
 pygame.display.set_caption("pytendo")
