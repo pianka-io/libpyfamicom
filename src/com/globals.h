@@ -14,6 +14,7 @@ typedef uint16_t word;
 
 #define CPU_MEMORY_SIZE 0x10000
 #define PPU_MEMORY_SIZE 0x4000
+#define OAM_MEMORY_SIZE 0x100
 #define PRG_ROM_OFFSET 0x8000
 #define PRG_RAM_BANK_SIZE 0x4000
 #define PALETTE_SIZE (32 * 48)

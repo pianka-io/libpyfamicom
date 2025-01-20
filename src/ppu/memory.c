@@ -24,6 +24,14 @@ void ppu_memory_write_byte(struct ppu_t* ppu, word address, byte value) {
     ppu->memory->data[address] = value;
 }
 
+byte oam_memory_read_byte(struct ppu_t* ppu, byte address) {
+    return ppu->memory->oam[address];
+}
+
+void oam_memory_write_byte(struct ppu_t* ppu, byte address, byte value) {
+    ppu->memory->oam[address] = value;
+}
+
 word translate_ppu_address(struct ppu_t* ppu, word address) {
     address &= 0x3FFF;
     if (address < 0x2000) {

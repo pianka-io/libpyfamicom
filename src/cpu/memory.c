@@ -52,7 +52,7 @@ byte cpu_memory_read_byte_ghost(struct cpu_t* cpu, word address, bool ghost) {
             return cpu->ppu->registers.oamaddr;
         case PPU_REGISTER_OAMDATA:
             //printf("OAMDATA_READ: Addr: 0x%02X, Value: 0x%02X\n", cpu->ppu->registers.oamaddr, cpu->ppu->registers.oamdata);
-            return cpu->ppu->registers.oamdata;
+            return oam_memory_read_byte(cpu->ppu, cpu->ppu->registers.oamdata);
         case PPU_REGISTER_PPUSCROLL:
             //printf("PPUSCROLL_READ: Value: 0x%02X, ReadPhase: %d\n",
 //                   (cpu->memory->ppuscroll_read ^= 1) ?
@@ -125,7 +125,7 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
             //printf("OAMADDR_WRITE: Value: 0x%02X\n", value);
             break;
         case PPU_REGISTER_OAMDATA:
-            cpu->ppu->registers.oamdata = value;
+            oam_memory_write_byte(cpu->ppu, cpu->ppu->registers.oamdata, value);
             //printf("OAMDATA_WRITE: Addr: 0x%02X, Value: 0x%02X\n", cpu->ppu->registers.oamaddr, value);
             break;
         case PPU_REGISTER_PPUSCROLL:
