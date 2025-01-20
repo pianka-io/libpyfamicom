@@ -32,6 +32,7 @@ byte cpu_memory_read_byte(struct cpu_t* cpu, word address) {
 byte cpu_memory_read_byte_ghost(struct cpu_t* cpu, word address, bool ghost) {
     address = translate_cpu_address(cpu, address);
     byte status;
+    byte value;
 
     switch (address) {
         case PPU_REGISTER_PPUCTRL:
@@ -48,29 +49,32 @@ byte cpu_memory_read_byte_ghost(struct cpu_t* cpu, word address, bool ghost) {
             //printf("PPUSTATUS_READ: Value: 0x%02X (VBLANK Cleared)\n", status);
             return status;
         case PPU_REGISTER_OAMADDR:
-            //printf("OAMADDR_READ: Value: 0x%02X\n", cpu->ppu->registers.oamaddr);
+            printf("OAMADDR_READ: Value: 0x%02X\n", cpu->ppu->registers.oamaddr);
             return cpu->ppu->registers.oamaddr;
         case PPU_REGISTER_OAMDATA:
-            //printf("OAMDATA_READ: Addr: 0x%02X, Value: 0x%02X\n", cpu->ppu->registers.oamaddr, cpu->ppu->registers.oamdata);
+            printf("OAMDATA_READ: Addr: 0x%02X, Value: 0x%02X\n", cpu->ppu->registers.oamaddr, cpu->ppu->registers.oamdata);
             return oam_memory_read_byte(cpu->ppu, cpu->ppu->registers.oamdata);
         case PPU_REGISTER_PPUSCROLL:
-            //printf("PPUSCROLL_READ: Value: 0x%02X, ReadPhase: %d\n",
-//                   (cpu->memory->ppuscroll_read ^= 1) ?
-//                   (cpu->ppu->registers.ppuscroll & 0xFF) :
-//                   (cpu->ppu->registers.ppuscroll >> 8),
-//                   cpu->memory->ppuscroll_read);
-            return (cpu->memory->ppuscroll_read ^= 1) ?
-                   (cpu->ppu->registers.ppuscroll & 0xFF) :
-                   (cpu->ppu->registers.ppuscroll >> 8);
+            value = (cpu->memory->ppuscroll_read ^ 1) ?
+                    (cpu->ppu->registers.ppuscroll & 0xFF) :
+                    (cpu->ppu->registers.ppuscroll >> 8);
+
+            if (!ghost) {
+                cpu->memory->ppuscroll_read ^= 1;
+            }
+
+            // printf("PPUSCROLL_READ: Value: 0x%02X, ReadPhase: %d\n", value, cpu->memory->ppuscroll_read);
+            return value;
         case PPU_REGISTER_PPUADDR:
-            //printf("PPUADDR_READ: Value: 0x%02X, ReadPhase: %d\n",
-//                   (cpu->memory->ppuaddr_read ^= 1) ?
-//                   (cpu->ppu->registers.ppuaddr & 0xFF) :
-//                   (cpu->ppu->registers.ppuaddr >> 8),
-//                   cpu->memory->ppuaddr_read);
-            return (cpu->memory->ppuaddr_read ^= 1) ?
-                   (cpu->ppu->registers.ppuaddr & 0xFF) :
-                   (cpu->ppu->registers.ppuaddr >> 8);
+            value = (cpu->memory->ppuaddr_read ^ 1) ?
+                    (cpu->ppu->registers.ppuaddr & 0xFF) :
+                    (cpu->ppu->registers.ppuaddr >> 8);
+
+            if (!ghost) {
+                cpu->memory->ppuaddr_read ^= 1;
+            }
+
+            return value;
         case PPU_REGISTER_PPUDATA:
             //printf("PPUDATA_READ: Value: 0x%02X\n", cpu->ppu->registers.ppudata);
             return cpu->ppu->registers.ppudata;
@@ -122,16 +126,16 @@ void cpu_memory_write_byte(struct cpu_t* cpu, word address, byte value) {
             break;
         case PPU_REGISTER_OAMADDR:
             cpu->ppu->registers.oamaddr = value;
-            //printf("OAMADDR_WRITE: Value: 0x%02X\n", value);
+            printf("OAMADDR_WRITE: Value: 0x%02X\n", value);
             break;
         case PPU_REGISTER_OAMDATA:
             oam_memory_write_byte(cpu->ppu, cpu->ppu->registers.oamdata, value);
-            //printf("OAMDATA_WRITE: Addr: 0x%02X, Value: 0x%02X\n", cpu->ppu->registers.oamaddr, value);
+            printf("OAMDATA_WRITE: Addr: 0x%02X, Value: 0x%02X\n", cpu->ppu->registers.oamaddr, value);
             break;
         case PPU_REGISTER_PPUSCROLL:
             cpu->ppu->registers.ppuscroll &= ~(0xFF << (cpu->memory->ppuscroll_write * 8));
             cpu->ppu->registers.ppuscroll |= (value << (cpu->memory->ppuscroll_write * 8));
-            //printf("PPUSCROLL_WRITE: Value: 0x%02X, WritePhase: %d\n", value, cpu->memory->ppuscroll_write);
+            // printf("PPUSCROLL_WRITE: Value: 0x%02X, WritePhase: %d\n", value, cpu->memory->ppuscroll_write);
             cpu->memory->ppuscroll_write ^= 1;
             break;
         case PPU_REGISTER_PPUADDR:
